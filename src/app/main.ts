@@ -100,6 +100,41 @@ function cacheBust(path: string): string {
   return `${path}?v=${encodeURIComponent(state.versao || "0")}`;
 }
 
+// URL das artes no site oficial: usada como fallback quando a arte local
+// não existe (ex.: publicação em GitHub Pages sem as .webp no repositório).
+const PROD_IMAGE_BASE = "https://forbiddenlegacy.com.br/img/cartas_grande";
+
+function prodImageUrl(slug: string): string {
+  return `${PROD_IMAGE_BASE}/${encodeURIComponent(slug)}.webp`;
+}
+
+// Persistência: quando o dev-server (/api/*) está disponível usa-o; caso
+// contrário (site estático / GitHub Pages) guarda tudo no localStorage do
+// navegador. Definido no boot().
+let backendAvailable = false;
+
+const LS_SAVED_SEEDS = "fl_saved_seeds_v1";
+const LS_EFFECT_TIERS = "fl_effect_tiers_v1";
+const LS_GENERATION_BANS = "fl_generation_bans_v1";
+
+function lsGet<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+function lsSet(key: string, value: unknown): void {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* ignore quota */
+  }
+}
+
 function normBanPart(s: string): string {
   return s
     .trim()
@@ -219,13 +254,22 @@ function renderSavedSeeds(): void {
 }
 
 async function fetchSavedSeeds(): Promise<void> {
-  try {
-    const res = await fetch("/api/saved-seeds");
-    const json = (await res.json()) as SavedSeedsFile;
-    state.savedSeeds = Array.isArray(json.seeds) ? json.seeds : [];
-  } catch {
-    state.savedSeeds = [];
+  if (backendAvailable) {
+    try {
+      const res = await fetch("/api/saved-seeds");
+      const json = (await res.json()) as SavedSeedsFile;
+      state.savedSeeds = Array.isArray(json.seeds) ? json.seeds : [];
+      renderSavedSeeds();
+      return;
+    } catch {
+      /* fall through para localStorage */
+    }
   }
+  const local = lsGet<SavedSeedsFile>(LS_SAVED_SEEDS, {
+    updated_at: null,
+    seeds: [],
+  });
+  state.savedSeeds = Array.isArray(local.seeds) ? local.seeds : [];
   renderSavedSeeds();
 }
 
@@ -283,53 +327,75 @@ async function saveCurrentSeed(): Promise<void> {
 
   el.btnSaveSeed.disabled = true;
   el.seedsStatus.textContent = "A guardar…";
-  try {
-    const res = await fetch("/api/saved-seeds", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(entry),
-    });
-    const json = (await res.json()) as {
-      ok?: boolean;
-      error?: string;
-      seeds?: SavedSeedsFile;
-    };
-    if (!res.ok || !json.ok) {
+  if (backendAvailable) {
+    try {
+      const res = await fetch("/api/saved-seeds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(entry),
+      });
+      const json = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        seeds?: SavedSeedsFile;
+      };
+      if (res.ok && json.ok) {
+        if (json.seeds?.seeds) state.savedSeeds = json.seeds.seeds;
+        else state.savedSeeds.unshift(entry);
+        setSeedsPanelOpen(true);
+        renderSavedSeeds();
+        el.seedsStatus.textContent = "Seed guardada.";
+        syncSaveSeedButton();
+        return;
+      }
       el.seedsStatus.textContent = `Falha: ${json.error || res.status}`;
       syncSaveSeedButton();
       return;
+    } catch {
+      /* fall through para localStorage */
     }
-    if (json.seeds?.seeds) state.savedSeeds = json.seeds.seeds;
-    else state.savedSeeds.unshift(entry);
-    setSeedsPanelOpen(true);
-    renderSavedSeeds();
-    el.seedsStatus.textContent = "Seed guardada.";
-  } catch (err) {
-    el.seedsStatus.textContent = `Erro: ${String(err)}`;
   }
+  state.savedSeeds.unshift(entry);
+  lsSet(LS_SAVED_SEEDS, {
+    updated_at: new Date().toISOString(),
+    seeds: state.savedSeeds,
+  });
+  setSeedsPanelOpen(true);
+  renderSavedSeeds();
+  el.seedsStatus.textContent = "Seed guardada (neste navegador).";
   syncSaveSeedButton();
 }
 
 async function deleteSavedSeed(id: string): Promise<void> {
   el.seedsStatus.textContent = "A apagar…";
-  try {
-    const res = await fetch(`/api/saved-seeds?id=${encodeURIComponent(id)}`, {
-      method: "DELETE",
-    });
-    const json = (await res.json()) as {
-      ok?: boolean;
-      error?: string;
-      seeds?: SavedSeedsFile;
-    };
-    if (!res.ok || !json.ok) {
+  if (backendAvailable) {
+    try {
+      const res = await fetch(`/api/saved-seeds?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      const json = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        seeds?: SavedSeedsFile;
+      };
+      if (res.ok && json.ok) {
+        state.savedSeeds =
+          json.seeds?.seeds || state.savedSeeds.filter((s) => s.id !== id);
+        renderSavedSeeds();
+        return;
+      }
       el.seedsStatus.textContent = `Falha: ${json.error || res.status}`;
       return;
+    } catch {
+      /* fall through para localStorage */
     }
-    state.savedSeeds = json.seeds?.seeds || state.savedSeeds.filter((s) => s.id !== id);
-    renderSavedSeeds();
-  } catch (err) {
-    el.seedsStatus.textContent = `Erro: ${String(err)}`;
   }
+  state.savedSeeds = state.savedSeeds.filter((s) => s.id !== id);
+  lsSet(LS_SAVED_SEEDS, {
+    updated_at: new Date().toISOString(),
+    seeds: state.savedSeeds,
+  });
+  renderSavedSeeds();
 }
 
 function loadSavedSeed(entry: SavedSeedEntry): void {
@@ -463,7 +529,13 @@ function openModal(slug: string): void {
     const img = document.createElement("img");
     img.src = cacheBust(c.image);
     img.alt = c.nome_pt || c.nome;
+    img.dataset.fallback = "0";
     img.onerror = () => {
+      if (img.dataset.fallback === "0") {
+        img.dataset.fallback = "1";
+        img.src = prodImageUrl(c.slug);
+        return;
+      }
       el.modalArt.innerHTML = `<div class="missing">Arte em falta</div>`;
     };
     el.modalArt.appendChild(img);
@@ -531,7 +603,13 @@ function artNode(c: Card): HTMLElement {
     img.src = cacheBust(c.image);
     img.alt = c.nome_pt || c.nome;
     img.loading = "lazy";
+    img.dataset.fallback = "0";
     img.onerror = () => {
+      if (img.dataset.fallback === "0") {
+        img.dataset.fallback = "1";
+        img.src = prodImageUrl(c.slug);
+        return;
+      }
       frame.innerHTML = `<span class="missing">sem arte</span>`;
     };
     frame.appendChild(img);
@@ -643,32 +721,43 @@ async function banAndRegen(slug: string): Promise<void> {
   const atributo = el.monsterAttr.value.trim();
   const key = banConfigKey(tipo, atributo);
   el.genMeta.textContent = `A banir ${slug} nesta config…`;
-  try {
-    const res = await fetch("/api/generation-bans", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tipo, atributo, slug }),
-    });
-    const data = (await res.json()) as {
-      ok?: boolean;
-      bans?: GenerationBansFile;
-      error?: string;
-    };
-    if (!res.ok || !data.ok) {
+  if (backendAvailable) {
+    try {
+      const res = await fetch("/api/generation-bans", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tipo, atributo, slug }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        bans?: GenerationBansFile;
+        error?: string;
+      };
+      if (res.ok && data.ok) {
+        if (data.bans?.bans) {
+          state.generationBans = { ...data.bans.bans };
+        } else {
+          const list = new Set(state.generationBans[key] || []);
+          list.add(slug.toLowerCase());
+          state.generationBans[key] = [...list];
+        }
+        runGenerate(state.lastSeed ?? undefined);
+        return;
+      }
       el.genMeta.textContent = `Falha a banir: ${data.error || res.status}`;
       return;
+    } catch {
+      /* fall through para localStorage */
     }
-    if (data.bans?.bans) {
-      state.generationBans = { ...data.bans.bans };
-    } else {
-      const list = new Set(state.generationBans[key] || []);
-      list.add(slug.toLowerCase());
-      state.generationBans[key] = [...list];
-    }
-    runGenerate(state.lastSeed ?? undefined);
-  } catch (err) {
-    el.genMeta.textContent = `Erro ao banir: ${String(err)}`;
   }
+  const list = new Set(state.generationBans[key] || []);
+  list.add(slug.toLowerCase());
+  state.generationBans[key] = [...list].sort();
+  lsSet(LS_GENERATION_BANS, {
+    updated_at: new Date().toISOString(),
+    bans: state.generationBans,
+  });
+  runGenerate(state.lastSeed ?? undefined);
 }
 
 function filtered(): Card[] {
@@ -908,25 +997,35 @@ function renderEffects(): void {
 
 async function saveEffectTiers(): Promise<void> {
   el.effectsStatus.textContent = "A guardar…";
-  try {
-    const body: EffectTiersFile = {
-      updated_at: new Date().toISOString(),
-      tiers: { ...state.effectTiers },
-    };
-    const res = await fetch("/api/effect-tiers", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    const json = (await res.json()) as { ok?: boolean; error?: string; count?: number };
-    if (!res.ok || !json.ok) {
+  const body: EffectTiersFile = {
+    updated_at: new Date().toISOString(),
+    tiers: { ...state.effectTiers },
+  };
+  if (backendAvailable) {
+    try {
+      const res = await fetch("/api/effect-tiers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const json = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        count?: number;
+      };
+      if (res.ok && json.ok) {
+        el.effectsStatus.textContent = `Guardado (${json.count} efeitos). Volta a gerar decks para aplicar.`;
+        return;
+      }
       el.effectsStatus.textContent = `Falha: ${json.error || res.status}`;
       return;
+    } catch {
+      /* fall through para localStorage */
     }
-    el.effectsStatus.textContent = `Guardado (${json.count} efeitos). Volta a gerar decks para aplicar.`;
-  } catch (err) {
-    el.effectsStatus.textContent = `Erro: ${String(err)}`;
   }
+  lsSet(LS_EFFECT_TIERS, body);
+  const count = Object.keys(body.tiers).length;
+  el.effectsStatus.textContent = `Guardado neste navegador (${count} efeitos). Volta a gerar decks para aplicar.`;
 }
 
 function runGenerate(seed?: number): void {
@@ -1109,11 +1208,16 @@ async function boot(): Promise<void> {
   if (calRes.ok) {
     state.npcCalibration = (await calRes.json()) as NpcCalibration;
   }
+
+  // Se o dev-server respondeu aos /api/*, há backend; caso contrário (site
+  // estático / GitHub Pages) a persistência passa a usar o localStorage.
+  backendAvailable = Boolean((effRes && effRes.ok) || (bansRes && bansRes.ok));
+
   if (effRes && effRes.ok) {
     const ef = (await effRes.json()) as EffectTiersFile;
     state.effectTiers = { ...(ef.tiers || {}) };
   } else {
-    // fallback static file
+    // fallback: ficheiro estático + edições guardadas no navegador
     try {
       const fr = await fetch("./data/effect-tiers.json");
       if (fr.ok) {
@@ -1122,6 +1226,10 @@ async function boot(): Promise<void> {
       }
     } catch {
       /* ignore */
+    }
+    const localEff = lsGet<EffectTiersFile>(LS_EFFECT_TIERS, { tiers: {} });
+    if (localEff && localEff.tiers) {
+      state.effectTiers = { ...state.effectTiers, ...localEff.tiers };
     }
   }
   if (bansRes && bansRes.ok) {
@@ -1136,6 +1244,15 @@ async function boot(): Promise<void> {
       }
     } catch {
       /* ignore */
+    }
+    const localBans = lsGet<GenerationBansFile>(LS_GENERATION_BANS, {
+      bans: {},
+    });
+    if (localBans && localBans.bans) {
+      for (const [k, v] of Object.entries(localBans.bans)) {
+        const merged = new Set([...(state.generationBans[k] || []), ...v]);
+        state.generationBans[k] = [...merged];
+      }
     }
   }
 
@@ -1228,7 +1345,7 @@ async function boot(): Promise<void> {
     void saveCurrentSeed();
   });
   el.btnSavedSeeds.addEventListener("click", () => {
-    const open = el.seedsPanel.hidden;
+    const open = Boolean(el.seedsPanel.hidden);
     setSeedsPanelOpen(open);
     if (open) void fetchSavedSeeds();
   });
