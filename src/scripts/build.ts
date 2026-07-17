@@ -107,7 +107,7 @@ export async function build(options?: {
   console.log("▶ validate-inventory");
   validateInventory();
 
-  console.log("▶ copiar public + data/assets → dist");
+  console.log("▶ copiar public + data/assets → docs");
   copyPublic();
   copyDataAndAssets();
 

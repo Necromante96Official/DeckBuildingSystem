@@ -1,0 +1,156 @@
+{
+  "archetypes": [
+    {
+      "id": "livre",
+      "label": "Por tipo",
+      "livre": true,
+      "synergy_tipos": []
+    },
+    {
+      "id": "red_eyes",
+      "label": "Red-Eyes",
+      "match": [
+        "red-eyes",
+        "red_eyes",
+        "red eyes",
+        "RED-EYES",
+        "b. skull",
+        "b_skull",
+        "meteor b.",
+        "lord of the red"
+      ],
+      "seed_slugs": [
+        "archfiend_black_skull_dragon",
+        "b_skull_dragon",
+        "lord_of_the_red",
+        "meteor_b_dragon",
+        "meteor_black_comet_dragon",
+        "meteor_dragon_red-eyes_impact",
+        "red-eyes_archfiend_of_lightning",
+        "red-eyes_b_dragon",
+        "red-eyes_b_metal_dragon",
+        "red-eyes_baby_dragon",
+        "red-eyes_black_dragon_sword",
+        "red-eyes_black_flare_dragon",
+        "red-eyes_black_fullmetal_dragon",
+        "red-eyes_dark_dragoon",
+        "red-eyes_darkness_dragon",
+        "red-eyes_darkness_metal_dragon",
+        "red-eyes_fang_with_chain",
+        "red-eyes_flare_metal_dragon",
+        "red-eyes_retro_dragon",
+        "red-eyes_slash_dragon",
+        "red-eyes_toon_dragon",
+        "red-eyes_wyvern",
+        "red-eyes_zombie_dragon",
+        "red-eyes_zombie_dragon_lord",
+        "red-eyes_zombie_necro_dragon",
+        "gearfried_the_red-eyes_iron_knight",
+        "black_dragons_chick"
+      ],
+      "synergy_tipos": [
+        "Dragon",
+        "Fiend",
+        "Warrior"
+      ],
+      "support_slugs": [
+        "black_dragons_chick"
+      ]
+    },
+    {
+      "id": "blue_eyes",
+      "label": "Blue-Eyes",
+      "match": [
+        "blue-eyes",
+        "blue_eyes",
+        "blue eyes",
+        "kaibaman"
+      ],
+      "seed_slugs": [
+        "blue-eyes_white_dragon",
+        "blue-eyes_ultimate_dragon",
+        "blue-eyes_shining_dragon",
+        "blue-eyes_twin_burst_dragon",
+        "blue-eyes_chaos_max_dragon",
+        "kaibaman"
+      ],
+      "synergy_tipos": [
+        "Dragon"
+      ],
+      "support_slugs": [
+        "kaibaman"
+      ]
+    },
+    {
+      "id": "dark_magician",
+      "label": "Dark Magician",
+      "match": [
+        "dark magician",
+        "dark_magician",
+        "magician of black chaos",
+        "the dark magicians"
+      ],
+      "seed_slugs": [
+        "dark_magician",
+        "dark_magician_girl",
+        "dark_magician_girl_the_dragon_knight",
+        "dark_magician_of_chaos",
+        "dark_magician_the_dragon_knight",
+        "the_dark_magicians",
+        "magician_of_black_chaos",
+        "master_of_chaos"
+      ],
+      "synergy_tipos": [
+        "Spellcaster"
+      ],
+      "support_slugs": []
+    },
+    {
+      "id": "black_luster_soldier",
+      "label": "Black Luster Soldier",
+      "match": [
+        "black luster",
+        "black_luster",
+        "super soldier",
+        "envoy of chaos",
+        "beginning knight",
+        "evening twilight"
+      ],
+      "seed_slugs": [
+        "black_luster_soldier",
+        "black_luster_soldier_-_envoy_of_the_beginning",
+        "black_luster_soldier_-_envoy_of_the_evening_twilight",
+        "black_luster_soldier_-_legendary_swordsman",
+        "black_luster_soldier_-_sacred_soldier",
+        "black_luster_soldier_-_soldier_of_light_and_darkness",
+        "black_luster_soldier_-_super_soldier",
+        "toon_black_luster_soldier",
+        "chaos_command_magician",
+        "chaos_emperor_dragon",
+        "chaos_sorcerer",
+        "envoy_of_chaos",
+        "beginning_knight",
+        "evening_twilight_knight",
+        "super_soldier_shield",
+        "super_soldier_soul",
+        "gaia_the_fierce_knight",
+        "gaia_the_dragon_champion",
+        "gaia_the_magical_knight",
+        "gaia_the_magical_knight_of_dragons",
+        "lord_gaia_the_fierce_knight",
+        "soldier_gaia_the_fierce_knight",
+        "arisen_gaia_the_fierce_knight",
+        "curse_of_dragon_the_cursed_dragon"
+      ],
+      "synergy_tipos": [
+        "Warrior",
+        "Dragon",
+        "Spellcaster"
+      ],
+      "support_slugs": [
+        "super_soldier_shield",
+        "super_soldier_soul"
+      ]
+    }
+  ]
+}

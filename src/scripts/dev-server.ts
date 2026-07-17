@@ -215,7 +215,7 @@ function isMain(): boolean {
 
 if (isMain()) {
   if (!fs.existsSync(path.join(DIST_DIR, "index.html"))) {
-    console.error("dist/ vazio. Corre primeiro: npm run build");
+    console.error("docs/ vazio. Corre primeiro: npm run build");
     process.exit(1);
   }
 

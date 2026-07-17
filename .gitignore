@@ -1,5 +1,7 @@
 node_modules/
+# Saída antiga; o site publicado fica em docs/ (versionada no Git)
 dist/
+# Artes de origem: o build copia para docs/assets/cartas_grande/
 assets/cartas_grande/*.webp
 *.log
 .DS_Store

@@ -34,7 +34,8 @@ export const ASSETS_GRANDE = path.join(ROOT, "assets", "cartas_grande");
 export const TOOLS_GRANDE = path.join(REPO_ROOT, "Tools", "img", "cartas_grande");
 
 export const PUBLIC_DIR = path.join(ROOT, "public");
-export const DIST_DIR = path.join(ROOT, "dist");
+/** Pasta publicada no GitHub Pages (Settings → Pages → /docs) */
+export const DIST_DIR = path.join(ROOT, "docs");
 
 export const PROD_IMAGE_BASE =
   "https://forbiddenlegacy.com.br/img/cartas_grande";

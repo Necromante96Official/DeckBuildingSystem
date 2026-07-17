@@ -58,7 +58,7 @@ Efeitos únicos em PT-BR; pesquisa por palavras; clique no texto para ver cartas
 | Sem deuses | Não inclui Obelisk / Slifer / Ra |
 | 1 / 2 / 3 deuses | Exactamente N (quais: seed) |
 
-## Abrir
+## Abrir (local / desenvolvimento)
 
 [`Abrir-Criacao-de-Deck.bat`](Abrir-Criacao-de-Deck.bat)
 
@@ -66,11 +66,25 @@ Efeitos únicos em PT-BR; pesquisa por palavras; clique no texto para ver cartas
 2. Abre o browser sozinho (so a janela CMD do servidor)
 3. **Abrir o .bat de novo** = fecha tudo e reinicia
 4. **Fechar o separador** = encerra o servidor (~6s)
-4. **Live reload:** muda `public/` ou `src/app` / `src/lib` e a página actualiza sozinha, lembrando aba, scroll, controlos e o último deck (seed)
+5. **Live reload:** muda `public/` ou `src/app` / `src/lib` e a página actualiza sozinha, lembrando aba, scroll, controlos e o último deck (seed)
 
 ```bash
-cd criação-de-deck
 npm install
 npm run build -- --no-download
 npm run dev
+```
+
+## GitHub Pages (site público, sem .bat)
+
+O build gera o site estático em [`docs/`](docs/) (com `index.html`, `app.js`, dados e artes). Seeds / bans / tiers de efeito gravam no **localStorage** do navegador quando não há servidor.
+
+1. Corre [`Publicar-GitHub-Pages.bat`](Publicar-GitHub-Pages.bat) (build → `docs/` → commit → push)
+2. No GitHub: **Settings → Pages → Build and deployment**
+   - Source: **Deploy from a branch**
+   - Branch: `main` (ou `master`) · pasta: **/docs**
+3. Abre `https://<usuario>.github.io/<repo>/`
+
+```bash
+npm run build -- --no-download
+# depois: commit da pasta docs/ e push
 ```
