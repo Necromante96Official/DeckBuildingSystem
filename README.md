@@ -74,17 +74,23 @@ npm run build -- --no-download
 npm run dev
 ```
 
-## GitHub Pages (site público, sem .bat)
+## GitHub Pages (site público, sem antivírus a bloquear)
 
-O build gera o site estático em [`docs/`](docs/) (com `index.html`, `app.js`, dados e artes). Seeds / bans / tiers de efeito gravam no **localStorage** do navegador quando não há servidor.
+O site estático fica em [`docs/`](docs/) (`index.html`, `app.js`, `data/`). Seeds / bans / tiers gravam no **localStorage** do navegador. No Pages, as artes carregam do site oficial (`forbiddenlegacy.com.br`).
 
-1. Corre [`Publicar-GitHub-Pages.bat`](Publicar-GitHub-Pages.bat) (build → `docs/` → commit → push)
+**Se a pasta `docs/` já está pronta** (já tem `index.html` + `data/cards.json`):
+
+1. Corre [`Push-Docs-Pages.bat`](Push-Docs-Pages.bat) (só commit + push)
 2. No GitHub: **Settings → Pages → Build and deployment**
    - Source: **Deploy from a branch**
    - Branch: `main` (ou `master`) · pasta: **/docs**
 3. Abre `https://<usuario>.github.io/<repo>/`
 
+Para regenerar `docs/` do zero (com artes locais copiadas) e depois publicar:
+
+[`Publicar-GitHub-Pages.bat`](Publicar-GitHub-Pages.bat)
+
 ```bash
 npm run build -- --no-download
-# depois: commit da pasta docs/ e push
+git add -A && git commit -m "Publish docs/" && git push
 ```

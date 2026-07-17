@@ -4,7 +4,17 @@ cd /d "%~dp0"
 
 echo.
 echo  Forbidden Legacy - Publicar no GitHub Pages (pasta docs/)
+echo  Dica: Publicar-GitHub-Pages.bat --push-only  = so commit/push (docs/ ja pronto)
 echo.
+
+where git >nul 2>&1
+if errorlevel 1 (
+  echo [ERRO] git nao encontrado no PATH.
+  pause
+  exit /b 1
+)
+
+if /I "%~1"=="--push-only" goto PUSH_ONLY
 
 where node >nul 2>&1
 if errorlevel 1 (
@@ -15,12 +25,6 @@ if errorlevel 1 (
 where npm >nul 2>&1
 if errorlevel 1 (
   echo [ERRO] npm nao encontrado no PATH.
-  pause
-  exit /b 1
-)
-where git >nul 2>&1
-if errorlevel 1 (
-  echo [ERRO] git nao encontrado no PATH.
   pause
   exit /b 1
 )
@@ -54,22 +58,45 @@ if not exist "docs\app.js" (
   pause
   exit /b 1
 )
+if not exist "docs\data\cards.json" (
+  echo [ERRO] docs\data\cards.json nao foi gerado.
+  pause
+  exit /b 1
+)
 
+goto DO_PUSH
+
+:PUSH_ONLY
+echo [skip] Build omitido (--push-only). Usando docs/ atual.
+if not exist "docs\index.html" (
+  echo [ERRO] docs\index.html em falta. Corre sem --push-only primeiro.
+  pause
+  exit /b 1
+)
+if not exist "docs\data\cards.json" (
+  echo [ERRO] docs\data\cards.json em falta. Corre sem --push-only primeiro.
+  pause
+  exit /b 1
+)
+type nul > "docs\.nojekyll"
+
+:DO_PUSH
 echo [4/4] Commit e push...
 git add -A
 git status --short
 git diff --cached --stat
 
-git commit -m "Publish site to docs/ for GitHub Pages"
+git commit -m "Publish static site to docs/ for GitHub Pages"
 if errorlevel 1 (
   echo.
   echo Nenhum commit novo (talvez ja estava atualizado). Continuando push...
 )
 
-git push
+git push -u origin HEAD
 if errorlevel 1 (
   echo.
   echo [ERRO] git push falhou. Verifica o remote e as credenciais.
+  echo Se ainda nao existe remote: git remote add origin https://github.com/SEU-USUARIO/SEU-REPO.git
   pause
   exit /b 1
 )

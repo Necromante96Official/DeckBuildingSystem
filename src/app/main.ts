@@ -108,6 +108,15 @@ function prodImageUrl(slug: string): string {
   return `${PROD_IMAGE_BASE}/${encodeURIComponent(slug)}.webp`;
 }
 
+/** No GitHub Pages as artes locais podem não existir — usa o CDN oficial. */
+function cardImageSrc(card: { slug: string; image: string }): string {
+  const host = typeof location !== "undefined" ? location.hostname : "";
+  if (host.endsWith("github.io") || host === "github.io") {
+    return cacheBust(prodImageUrl(card.slug));
+  }
+  return cacheBust(card.image);
+}
+
 // Persistência: quando o dev-server (/api/*) está disponível usa-o; caso
 // contrário (site estático / GitHub Pages) guarda tudo no localStorage do
 // navegador. Definido no boot().
@@ -527,7 +536,7 @@ function openModal(slug: string): void {
   el.modalArt.innerHTML = "";
   if (c.image_status === "ok") {
     const img = document.createElement("img");
-    img.src = cacheBust(c.image);
+    img.src = cardImageSrc(c);
     img.alt = c.nome_pt || c.nome;
     img.dataset.fallback = "0";
     img.onerror = () => {
@@ -600,7 +609,7 @@ function artNode(c: Card): HTMLElement {
   frame.className = "art-frame";
   if (c.image_status === "ok") {
     const img = document.createElement("img");
-    img.src = cacheBust(c.image);
+    img.src = cardImageSrc(c);
     img.alt = c.nome_pt || c.nome;
     img.loading = "lazy";
     img.dataset.fallback = "0";

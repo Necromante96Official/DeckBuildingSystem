@@ -1763,6 +1763,13 @@
   function prodImageUrl(slug) {
     return `${PROD_IMAGE_BASE}/${encodeURIComponent(slug)}.webp`;
   }
+  function cardImageSrc(card) {
+    const host = typeof location !== "undefined" ? location.hostname : "";
+    if (host.endsWith("github.io") || host === "github.io") {
+      return cacheBust(prodImageUrl(card.slug));
+    }
+    return cacheBust(card.image);
+  }
   var backendAvailable = false;
   var LS_SAVED_SEEDS = "fl_saved_seeds_v1";
   var LS_EFFECT_TIERS = "fl_effect_tiers_v1";
@@ -2083,7 +2090,7 @@
     el.modalArt.innerHTML = "";
     if (c.image_status === "ok") {
       const img = document.createElement("img");
-      img.src = cacheBust(c.image);
+      img.src = cardImageSrc(c);
       img.alt = c.nome_pt || c.nome;
       img.dataset.fallback = "0";
       img.onerror = () => {
@@ -2142,7 +2149,7 @@
     frame.className = "art-frame";
     if (c.image_status === "ok") {
       const img = document.createElement("img");
-      img.src = cacheBust(c.image);
+      img.src = cardImageSrc(c);
       img.alt = c.nome_pt || c.nome;
       img.loading = "lazy";
       img.dataset.fallback = "0";
