@@ -1,0 +1,19 @@
+{
+  "bans": {
+    "aqua|water": [
+      "dragon_capture_jar",
+      "eradicating_aerosol",
+      "level_up"
+    ],
+    "pyro|": [
+      "dragon_capture_jar"
+    ],
+    "dragon|": [
+      "salamandra"
+    ],
+    "fiend|dark": [
+      "dragon_capture_jar"
+    ]
+  },
+  "updated_at": "2026-07-16T01:16:02.400Z"
+}

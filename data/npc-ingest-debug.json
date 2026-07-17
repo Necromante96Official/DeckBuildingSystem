@@ -1,0 +1,67 @@
+{
+  "catalog_size": 982,
+  "workbook": "D:\\forbidden-legacy-releases\\criação-de-deck\\data\\source\\NPC-deck.xlsx",
+  "sheets": [
+    {
+      "name": "Worksheet",
+      "row_count": 27,
+      "preview": [
+        {
+          "row": 1,
+          "cells": [
+            "NOME NPC DECK"
+          ]
+        },
+        {
+          "row": 2,
+          "cells": [
+            "NOME",
+            "QUANTIDADE"
+          ]
+        }
+      ],
+      "layout": "blank_row_blocks",
+      "decks_found": 0,
+      "matched_cells": 0,
+      "unmatched_sample": [
+        "NOME NPC DECK",
+        "QUANTIDADE"
+      ],
+      "unmatched_rate": 1
+    }
+  ],
+  "extracted": 0,
+  "notes": "Parseado 1 folha(s) de NPC-deck.xlsx. Decks extraídos: 0 (W0/M0/S0).",
+  "by_strength": {
+    "weak": {
+      "equip_avg": 6,
+      "trap_avg": 6,
+      "spell_avg": 3,
+      "equip_target": 6,
+      "trap_target": 6,
+      "spell_target": 3,
+      "boss_density": 0.05,
+      "sample_size": 0
+    },
+    "medium": {
+      "equip_avg": 7,
+      "trap_avg": 7,
+      "spell_avg": 4,
+      "equip_target": 7,
+      "trap_target": 7,
+      "spell_target": 4,
+      "boss_density": 0.12,
+      "sample_size": 0
+    },
+    "strong": {
+      "equip_avg": 8,
+      "trap_avg": 8,
+      "spell_avg": 5,
+      "equip_target": 8,
+      "trap_target": 8,
+      "spell_target": 5,
+      "boss_density": 0.25,
+      "sample_size": 0
+    }
+  }
+}

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Criação de Deck — Forbidden Legacy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Source+Sans+3:wght@400;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <header class="hero">
+      <p class="brand-mark">Forbidden Legacy</p>
+      <h1>Criação de Deck</h1>
+      <p class="tagline">Por tipo · Magias opcionais · Poder raridade+efeito · Dos Deuses</p>
+      <nav class="tabs" role="tablist" aria-label="Secções">
+        <button type="button" class="tab is-active" role="tab" aria-selected="true" data-tab="create"
+          id="tab-create">Criar Deck</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" data-tab="catalog"
+          id="tab-catalog">Catálogo</button>
+        <button type="button" class="tab" role="tab" aria-selected="false" data-tab="effects"
+          id="tab-effects">Efeitos</button>
+      </nav>
+    </header>
+
+    <section id="panel-create" class="panel is-active" role="tabpanel" aria-labelledby="tab-create">
+      <div class="control-surface">
+        <div class="create-controls">
+          <div class="filter-group filter-theme">
+            <label class="field">
+              <span>Arquetípico</span>
+              <select id="archetype"></select>
+            </label>
+            <label class="field" id="field-monster-tipo">
+              <span>Tipo</span>
+              <select id="monster-tipo">
+                <option value="">— raça —</option>
+              </select>
+            </label>
+            <label class="field" id="field-monster-attr">
+              <span>Atributo</span>
+              <select id="monster-attr">
+                <option value="">— atributo —</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Dificuldade</span>
+              <select id="tier">
+                <option value="3" selected>T3 — Mediano</option>
+                <option value="4">T4 — Hard</option>
+                <option value="5">T5 — Ultra Hard</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>Deuses</span>
+              <select id="gods-mode">
+                <option value="off" selected>Sem deuses</option>
+                <option value="gods_1">1 deus</option>
+                <option value="gods_2">2 deuses</option>
+                <option value="gods_3">3 deuses</option>
+              </select>
+            </label>
+          </div>
+          <div class="filter-group filter-quota">
+            <label class="field field-qty">
+              <span>Magias</span>
+              <select id="qty-spell">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+              </select>
+            </label>
+            <label class="field field-qty">
+              <span>Equips</span>
+              <select id="qty-equip">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7" selected>7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+              </select>
+            </label>
+            <label class="field field-qty">
+              <span>Armadilhas</span>
+              <select id="qty-trap">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6" selected>6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+                <option value="11">11</option>
+                <option value="12">12</option>
+                <option value="13">13</option>
+                <option value="14">14</option>
+                <option value="15">15</option>
+              </select>
+            </label>
+          </div>
+          <div class="actions">
+            <button type="button" class="btn primary" id="btn-generate">Gerar deck</button>
+            <button type="button" class="btn ghost" id="btn-save-seed" disabled>Salvar seed</button>
+            <button type="button" class="btn ghost" id="btn-saved-seeds" aria-expanded="false" aria-controls="seeds-panel">Seeds salvas</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="deck-stage">
+        <aside id="seeds-panel" class="seeds-panel" hidden>
+          <div class="seeds-panel-head">
+            <h2>Seeds salvas</h2>
+            <button type="button" class="btn ghost seeds-close" id="btn-close-seeds">Fechar</button>
+          </div>
+          <p class="seeds-status" id="seeds-status"></p>
+          <div class="seeds-list" id="seeds-list" role="list"></div>
+        </aside>
+
+        <div class="deck-summary" id="deck-summary" hidden>
+          <div class="sum-item"><b id="sum-total">0</b><span>Cartas</span></div>
+          <div class="sum-item"><b id="sum-power">—</b><span>Poder</span></div>
+          <div class="sum-item"><b id="sum-avg">—</b><span>Tier médio</span></div>
+          <div class="sum-item"><b id="sum-mon">0</b><span>Monstro</span></div>
+          <div class="sum-item"><b id="sum-spell">0</b><span>Magia</span></div>
+          <div class="sum-item"><b id="sum-equip">0</b><span>Equip</span></div>
+          <div class="sum-item"><b id="sum-trap">0</b><span>Trap</span></div>
+        </div>
+        <p class="gen-meta" id="gen-meta">Em Por tipo, escolhe raça e/ou atributo; depois gera o deck.</p>
+        <p class="warnings" id="deck-warnings"></p>
+
+        <div class="deck-board" id="deck-grid" aria-label="Deck gerado"></div>
+      </div>
+    </section>
+
+    <section id="panel-catalog" class="panel" role="tabpanel" aria-labelledby="tab-catalog" hidden>
+      <div class="panel-shell">
+        <div class="filters">
+          <label class="field search">
+            <span>Buscar</span>
+            <input type="search" id="q" placeholder="Nome ou slug…" autocomplete="off" />
+          </label>
+          <div class="chip-group">
+            <span class="chip-label">Raridade</span>
+            <div class="chips" id="rarity-chips"></div>
+          </div>
+          <div class="chip-group">
+            <span class="chip-label">Tipo</span>
+            <div class="chips" id="type-chips"></div>
+          </div>
+          <div class="chip-group">
+            <span class="chip-label">Power Tier</span>
+            <div class="chips" id="tier-chips"></div>
+          </div>
+          <label class="toggle">
+            <input type="checkbox" id="only-effect" />
+            Só com efeito
+          </label>
+        </div>
+        <p class="count" id="count"></p>
+        <div class="catalog-grid" id="grid"></div>
+      </div>
+    </section>
+
+    <section id="panel-effects" class="panel" role="tabpanel" aria-labelledby="tab-effects" hidden>
+      <div class="panel-shell">
+        <div class="effects-toolbar">
+          <p class="effects-hint">Classifica cada efeito único (PT-BR) como Tier 3, 4 ou 5. Clica no texto para ver as
+            cartas. Ao salvar, o poder do deck passa a usar essas escolhas.</p>
+          <button type="button" class="btn primary" id="btn-save-effects">Salvar tiers de efeito</button>
+        </div>
+        <label class="field effects-search">
+          <span>Pesquisar efeitos</span>
+          <input type="search" id="effects-q" placeholder="Ex.: destrói, dragão, ataque, oponente…"
+            autocomplete="off" />
+        </label>
+        <p class="count" id="effects-count"></p>
+        <p class="warnings" id="effects-status"></p>
+        <div class="effects-list" id="effects-list"></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" id="modal-backdrop"></div>
+    <article class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button type="button" class="modal-close" id="modal-close" aria-label="Fechar">×</button>
+      <div class="modal-art" id="modal-art"></div>
+      <div class="modal-body" id="modal-body"></div>
+    </article>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+
+</html>

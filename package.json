@@ -1,0 +1,25 @@
+{
+  "name": "criacao-de-deck",
+  "private": true,
+  "version": "0.2.0",
+  "description": "Criação inteligente de decks Forbidden Legacy (efeitos, Power Tier, arquetípicos)",
+  "type": "module",
+  "scripts": {
+    "ingest": "tsx src/scripts/ingest-catalog.ts",
+    "ingest-npc": "tsx src/scripts/ingest-npc-decks.ts",
+    "sync-images": "tsx src/scripts/sync-images.ts",
+    "analyze": "tsx src/scripts/analyze-effects.ts",
+    "archetypes": "tsx src/scripts/build-archetype-index.ts",
+    "validate": "tsx src/scripts/validate-inventory.ts",
+    "build": "tsx src/scripts/build.ts",
+    "typecheck": "tsc --noEmit",
+    "dev": "tsx src/scripts/dev-server.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "esbuild": "^0.25.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
+    "xlsx": "^0.18.5"
+  }
+}

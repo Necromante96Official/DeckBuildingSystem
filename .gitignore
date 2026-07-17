@@ -1,0 +1,5 @@
+node_modules/
+dist/
+assets/cartas_grande/*.webp
+*.log
+.DS_Store
