@@ -562,7 +562,7 @@ if (isMain()) {
   });
 
   server.listen(PORT, "127.0.0.1", () => {
-    console.log(`criação-de-deck → http://127.0.0.1:${PORT}/`);
+    console.log(`DeckBuildingSystem → http://127.0.0.1:${PORT}/`);
     console.log("livereload activo (public/ + src/app + src/lib)");
     console.log("fechar a pagina no browser encerra o sistema");
   });

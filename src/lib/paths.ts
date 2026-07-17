@@ -4,10 +4,10 @@ import { fileURLToPath } from "node:url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-/** Raiz do projeto criação-de-deck */
+/** Raiz do projeto DeckBuildingSystem */
 export const ROOT = path.resolve(__dirname, "../..");
 
-/** Raiz do repositório forbidden-legacy-releases */
+/** Raiz do monorepo pai (quando existir; usado só por scripts de ingest/imagens) */
 export const REPO_ROOT = path.resolve(ROOT, "..");
 
 export const DATA_DIR = path.join(ROOT, "data");

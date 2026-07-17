@@ -1,5 +1,5 @@
 {
-  "name": "criacao-de-deck",
+  "name": "deck-building-system",
   "private": true,
   "version": "0.2.0",
   "description": "Criação inteligente de decks Forbidden Legacy (efeitos, Power Tier, arquetípicos)",

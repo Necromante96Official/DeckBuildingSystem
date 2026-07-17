@@ -2,11 +2,11 @@
 setlocal EnableExtensions
 cd /d "%~dp0"
 
-set "WIN_TITLE=Criacao de Deck - Forbidden Legacy"
+set "WIN_TITLE=DeckBuildingSystem - Forbidden Legacy"
 set "PORT=5177"
 
 echo.
-echo  Forbidden Legacy - Criacao de Deck
+echo  Forbidden Legacy - DeckBuildingSystem
 echo  .bat de novo = reinicia ^| Fechar pagina = encerra
 echo.
 

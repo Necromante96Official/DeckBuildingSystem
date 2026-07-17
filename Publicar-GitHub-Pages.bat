@@ -81,12 +81,18 @@ if not exist "docs\data\cards.json" (
 type nul > "docs\.nojekyll"
 
 :DO_PUSH
-echo [4/4] Commit e push...
+echo [4/4] Ajustando remote e fazendo commit/push...
+git remote get-url origin >nul 2>&1
+if errorlevel 1 (
+  git remote add origin https://github.com/Necromante96Official/DeckBuildingSystem.git
+) else (
+  git remote set-url origin https://github.com/Necromante96Official/DeckBuildingSystem.git
+)
 git add -A
 git status --short
 git diff --cached --stat
 
-git commit -m "Publish static site to docs/ for GitHub Pages"
+git commit -m "Align project with DeckBuildingSystem GitHub Pages"
 if errorlevel 1 (
   echo.
   echo Nenhum commit novo (talvez ja estava atualizado). Continuando push...
@@ -96,7 +102,7 @@ git push -u origin HEAD
 if errorlevel 1 (
   echo.
   echo [ERRO] git push falhou. Verifica o remote e as credenciais.
-  echo Se ainda nao existe remote: git remote add origin https://github.com/SEU-USUARIO/SEU-REPO.git
+  echo Remote esperado: https://github.com/Necromante96Official/DeckBuildingSystem.git
   pause
   exit /b 1
 )
@@ -106,8 +112,8 @@ echo ========================================
 echo  Push OK.
 echo  No GitHub: Settings -^> Pages -^> Source:
 echo    Deploy from a branch
-echo    Branch: main (ou master)  /  pasta: /docs
-echo  Depois abre: https://SEU-USUARIO.github.io/SEU-REPO/
+echo    Branch: main  /  pasta: /docs
+echo  Site: https://necromante96official.github.io/DeckBuildingSystem/
 echo ========================================
 echo.
 pause
