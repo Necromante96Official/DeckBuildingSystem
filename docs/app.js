@@ -1754,7 +1754,11 @@
     modalBackdrop: document.getElementById("modal-backdrop"),
     modalClose: document.getElementById("modal-close"),
     modalArt: document.getElementById("modal-art"),
-    modalBody: document.getElementById("modal-body")
+    modalBody: document.getElementById("modal-body"),
+    btnHelp: document.getElementById("btn-help"),
+    guide: document.getElementById("guide"),
+    guideBackdrop: document.getElementById("guide-backdrop"),
+    guideClose: document.getElementById("guide-close")
   };
   function cacheBust(path) {
     return `${path}?v=${encodeURIComponent(state.versao || "0")}`;
@@ -2143,6 +2147,14 @@
   }
   function closeModal() {
     el.modal.hidden = true;
+  }
+  function openGuide() {
+    el.guide.hidden = false;
+    el.btnHelp.setAttribute("aria-expanded", "true");
+  }
+  function closeGuide() {
+    el.guide.hidden = true;
+    el.btnHelp.setAttribute("aria-expanded", "false");
   }
   function artNode(c) {
     const frame = document.createElement("div");
@@ -2781,8 +2793,15 @@
     });
     el.modalClose.addEventListener("click", closeModal);
     el.modalBackdrop.addEventListener("click", closeModal);
+    el.btnHelp.addEventListener("click", openGuide);
+    el.guideClose.addEventListener("click", closeGuide);
+    el.guideBackdrop.addEventListener("click", closeGuide);
     document.addEventListener("keydown", (ev) => {
       if (ev.key !== "Escape") return;
+      if (!el.guide.hidden) {
+        closeGuide();
+        return;
+      }
       if (!el.modal.hidden) {
         closeModal();
         return;

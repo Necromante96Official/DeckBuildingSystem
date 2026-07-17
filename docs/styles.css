@@ -59,6 +59,7 @@ body {
 /* ——— Hero ——— */
 .hero {
   flex: 0 0 auto;
+  position: relative;
   padding: clamp(0.9rem, 1.6vw, 1.35rem) clamp(0.95rem, 1.6vw, 1.45rem) 0;
   border: 1px solid var(--line);
   background: var(--surface);
@@ -1094,4 +1095,403 @@ body {
   .catalog-grid {
     grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
   }
+}
+
+/* ——— Como Usar? button ——— */
+.help-btn {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 8.5rem;
+  height: 2.55rem;
+  padding: 0 1.1rem;
+  border: 1px solid var(--gold);
+  background:
+    linear-gradient(120deg, transparent 30%, rgba(255, 220, 140, 0.28) 48%, transparent 62%),
+    linear-gradient(180deg, rgba(200, 151, 58, 0.28), rgba(200, 151, 58, 0.08));
+  background-size: 220% 100%, 100% 100%;
+  color: var(--gold);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  overflow: hidden;
+  isolation: isolate;
+  animation: helpPulse 2.4s ease-in-out infinite;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+
+.help-btn:hover,
+.help-btn:focus-visible {
+  transform: scale(1.06);
+  outline: none;
+  border-color: #e8c56a;
+  background-position: 100% 0, 0 0;
+  animation: helpPulse 1.2s ease-in-out infinite, helpShimmer 1.6s linear infinite;
+}
+
+.help-btn-fx {
+  position: absolute;
+  inset: -2px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  pointer-events: none;
+  color: #f0d078;
+  opacity: 0.95;
+  filter: drop-shadow(0 0 4px rgba(200, 151, 58, 0.85));
+}
+
+.help-btn-label {
+  position: relative;
+  z-index: 1;
+}
+
+.help-btn-mark {
+  display: none;
+  position: relative;
+  z-index: 1;
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.scratch {
+  stroke-dasharray: 28;
+  stroke-dashoffset: 28;
+  animation: scratchDraw 2.8s ease-in-out infinite;
+}
+
+.scratch.s2 {
+  animation-delay: 0.25s;
+}
+
+.scratch.s3 {
+  animation-delay: 0.5s;
+}
+
+.scratch.s4 {
+  animation-delay: 0.75s;
+}
+
+.scratch.s5 {
+  animation-delay: 1s;
+}
+
+.scratch.s6 {
+  animation-delay: 1.25s;
+}
+
+.spark {
+  animation: sparkBlink 1.6s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.spark.sk2 {
+  animation-delay: 0.3s;
+}
+
+.spark.sk3 {
+  animation-delay: 0.6s;
+}
+
+.spark.sk4 {
+  animation-delay: 0.9s;
+}
+
+.ray {
+  opacity: 0.35;
+  animation: rayFlash 1.8s ease-in-out infinite;
+}
+
+.ray.r2 {
+  animation-delay: 0.55s;
+}
+
+@keyframes helpPulse {
+
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(200, 151, 58, 0.55),
+      0 0 18px rgba(200, 151, 58, 0.25),
+      inset 0 0 12px rgba(200, 151, 58, 0.12);
+  }
+
+  50% {
+    box-shadow:
+      0 0 0 8px rgba(200, 151, 58, 0),
+      0 0 28px rgba(232, 197, 106, 0.55),
+      inset 0 0 18px rgba(200, 151, 58, 0.22);
+  }
+}
+
+@keyframes helpShimmer {
+  0% {
+    background-position: 120% 0, 0 0;
+  }
+
+  100% {
+    background-position: -40% 0, 0 0;
+  }
+}
+
+@keyframes scratchDraw {
+
+  0%,
+  100% {
+    stroke-dashoffset: 28;
+    opacity: 0.25;
+  }
+
+  40%,
+  60% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+}
+
+@keyframes sparkBlink {
+
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.7);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes rayFlash {
+
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+
+  45%,
+  55% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 720px) {
+  .help-btn {
+    min-width: 2.55rem;
+    width: 2.55rem;
+    padding: 0;
+  }
+
+  .help-btn-label {
+    display: none;
+  }
+
+  .help-btn-mark {
+    display: inline;
+  }
+}
+
+/* ——— Guia Como Usar ——— */
+.guide[hidden] {
+  display: none !important;
+}
+
+.guide {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: var(--wall);
+}
+
+.guide-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.76);
+  backdrop-filter: blur(5px);
+  animation: fade 0.2s ease both;
+}
+
+.guide-panel {
+  position: relative;
+  z-index: 1;
+  width: min(42rem, 100%);
+  max-height: min(90vh, 860px);
+  overflow: auto;
+  padding: 1.25rem 1.35rem 1.4rem;
+  border: 1px solid var(--line-strong);
+  background: linear-gradient(160deg, #1c1712 0%, #0d0b0a 100%);
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(200, 151, 58, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  animation: modalIn 0.3s ease both;
+}
+
+.guide-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.55rem;
+}
+
+.guide-kicker {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.guide-head h2 {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.7rem, 3vw, 2.15rem);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+.guide-intro {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+
+.guide-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.guide-section {
+  border: 1px solid var(--line);
+  background: rgba(8, 7, 9, 0.55);
+  transition: border-color 0.15s ease;
+}
+
+.guide-section[open] {
+  border-color: var(--line-strong);
+  box-shadow: inset 0 0 0 1px rgba(200, 151, 58, 0.06);
+}
+
+.guide-section>summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 0.8rem 1rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  user-select: none;
+}
+
+.guide-section>summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide-section>summary::after {
+  content: "+";
+  color: var(--gold);
+  font-size: 1.2rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.guide-section[open]>summary::after {
+  content: "−";
+}
+
+.guide-section>summary:hover {
+  color: var(--gold);
+}
+
+.guide-section-body {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid rgba(200, 151, 58, 0.12);
+  animation: fadeUp 0.28s ease both;
+  color: var(--ink);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.guide-section-body p,
+.guide-section-body ul {
+  margin: 0.65rem 0 0;
+}
+
+.guide-section-body ul {
+  padding-left: 1.15rem;
+}
+
+.guide-section-body li+li {
+  margin-top: 0.35rem;
+}
+
+.guide-dl {
+  margin: 0.65rem 0 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.guide-dl dt {
+  margin: 0;
+  color: var(--gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.guide-dl dd {
+  margin: 0.2rem 0 0;
+  color: var(--ink);
+}
+
+.guide-table {
+  width: 100%;
+  margin: 0.75rem 0 0;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.guide-table th,
+.guide-table td {
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--line);
+  text-align: left;
+}
+
+.guide-table th {
+  color: var(--muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.guide-formula {
+  margin-top: 0.75rem !important;
+  padding: 0.75rem 0.9rem;
+  border-left: 2px solid var(--gold);
+  background: rgba(200, 151, 58, 0.08);
+  font-family: var(--font-serif);
+  font-size: 1.08rem;
+  color: var(--gold);
 }

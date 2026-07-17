@@ -16,6 +16,30 @@
 <body>
   <div class="app">
     <header class="hero">
+      <button type="button" class="help-btn" id="btn-help" aria-haspopup="dialog" aria-controls="guide"
+        aria-expanded="false">
+        <svg class="help-btn-fx" viewBox="0 0 160 48" aria-hidden="true" focusable="false">
+          <g class="help-scratches" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+            <path class="scratch s1" d="M8 10 L28 6" />
+            <path class="scratch s2" d="M14 38 L36 32" />
+            <path class="scratch s3" d="M132 8 L152 14" />
+            <path class="scratch s4" d="M126 40 L148 34" />
+            <path class="scratch s5" d="M72 4 L88 2" />
+            <path class="scratch s6" d="M68 44 L92 46" />
+          </g>
+          <g class="help-sparks" fill="currentColor">
+            <circle class="spark sk1" cx="18" cy="22" r="1.6" />
+            <circle class="spark sk2" cx="142" cy="24" r="1.8" />
+            <circle class="spark sk3" cx="48" cy="8" r="1.2" />
+            <circle class="spark sk4" cx="112" cy="40" r="1.4" />
+            <path class="ray r1" d="M40 24 L46 24 M43 21 L43 27" stroke="currentColor" stroke-width="1.2" fill="none" />
+            <path class="ray r2" d="M118 22 L126 22 M122 18 L122 26" stroke="currentColor" stroke-width="1.2"
+              fill="none" />
+          </g>
+        </svg>
+        <span class="help-btn-label">Como Usar?</span>
+        <span class="help-btn-mark" aria-hidden="true">?</span>
+      </button>
       <p class="brand-mark">Forbidden Legacy</p>
       <h1>Criação de Deck</h1>
       <p class="tagline">Por tipo · Magias opcionais · Poder raridade+efeito · Dos Deuses</p>
@@ -135,7 +159,8 @@
           <div class="actions">
             <button type="button" class="btn primary" id="btn-generate">Gerar deck</button>
             <button type="button" class="btn ghost" id="btn-save-seed" disabled>Salvar seed</button>
-            <button type="button" class="btn ghost" id="btn-saved-seeds" aria-expanded="false" aria-controls="seeds-panel">Seeds salvas</button>
+            <button type="button" class="btn ghost" id="btn-saved-seeds" aria-expanded="false"
+              aria-controls="seeds-panel">Seeds salvas</button>
           </div>
         </div>
       </div>
@@ -220,6 +245,172 @@
       <button type="button" class="modal-close" id="modal-close" aria-label="Fechar">×</button>
       <div class="modal-art" id="modal-art"></div>
       <div class="modal-body" id="modal-body"></div>
+    </article>
+  </div>
+
+  <div class="guide" id="guide" hidden>
+    <div class="guide-backdrop" id="guide-backdrop"></div>
+    <article class="guide-panel" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+      <header class="guide-head">
+        <div>
+          <p class="guide-kicker">Guia rápido</p>
+          <h2 id="guide-title">Como Usar?</h2>
+        </div>
+        <button type="button" class="modal-close" id="guide-close" aria-label="Fechar guia">×</button>
+      </header>
+      <p class="guide-intro">Tudo o que precisas para gerar decks, ler o poder das cartas e usar as três abas — sem
+        jargão desnecessário.</p>
+      <div class="guide-body">
+        <details class="guide-section" open>
+          <summary>Visão geral</summary>
+          <div class="guide-section-body">
+            <p>O sistema gera um <strong>deck de 40 cartas</strong> com sinergia automática.</p>
+            <ul>
+              <li>Máximo de <strong>3 cópias</strong> por carta (deuses egípcios: só 1).</li>
+              <li><strong>Não usa banlist</strong> do deckbuilder — só as regras deste gerador.</li>
+              <li>Seeds, bans e tiers de efeito ficam guardados <strong>neste navegador</strong> (localStorage) no site
+                público.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Aba Criar Deck</summary>
+          <div class="guide-section-body">
+            <dl class="guide-dl">
+              <dt>Arquetípico</dt>
+              <dd><strong>Por tipo</strong> — escolhe raça e/ou atributo (ex.: Aqua + Water). Todos os monstros batem
+                nos filtros. <strong>Nomeados</strong> — pool do tema + blacklist cruzada.</dd>
+              <dt>Dificuldade</dt>
+              <dd>T3 Mediano · T4 Hard · T5 Ultra Hard — define a faixa de <em>poder total</em> do deck (ver secção
+                Poder do deck).</dd>
+              <dt>Deuses</dt>
+              <dd>Sem deuses, ou exactamente 1 / 2 / 3 (Obelisk, Slifer, Ra — a seed decide quais).</dd>
+              <dt>Magias / Equips / Armadilhas</dt>
+              <dd>Quotas de <strong>0 a 15</strong> cada (defaults 3 / 7 / 6). Se a soma passar do espaço (40 −
+                monstros), o gerador reduz automaticamente.</dd>
+              <dt>Gerar deck</dt>
+              <dd>Cria um deck novo com seed aleatória (ou reutiliza a última).</dd>
+              <dt>Banir carta (×)</dt>
+              <dd>No hover de uma carta do deck, o × remove-a desta combinação raça/atributo e regenera.</dd>
+              <dt>Seeds</dt>
+              <dd><strong>Salvar seed</strong> guarda a combinação actual; <strong>Seeds salvas</strong> permite
+                carregar ou apagar.</dd>
+            </dl>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Raridades e pesos</summary>
+          <div class="guide-section-body">
+            <p>Cada raridade contribui um peso fixo para o poder da carta:</p>
+            <table class="guide-table">
+              <thead>
+                <tr>
+                  <th>Raridade</th>
+                  <th>Peso</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="badge N">N</span> Comum</td>
+                  <td><strong>1</strong></td>
+                </tr>
+                <tr>
+                  <td><span class="badge R">R</span> Rara</td>
+                  <td><strong>2</strong></td>
+                </tr>
+                <tr>
+                  <td><span class="badge SR">SR</span> Super Rara</td>
+                  <td><strong>3</strong></td>
+                </tr>
+                <tr>
+                  <td><span class="badge UR">UR</span> Ultra Rara</td>
+                  <td><strong>4</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Efeitos e pesos</summary>
+          <div class="guide-section-body">
+            <ul>
+              <li>Carta <strong>vanilla</strong> (sem efeito) → peso de efeito <strong>0</strong>.</li>
+              <li>Com efeito → peso <strong>3, 4 ou 5</strong> (Tier do efeito).</li>
+              <li>Na aba <strong>Efeitos</strong> podes reclassificar cada texto único e gravar; o gerador passa a usar
+                essas escolhas.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Poder da carta</summary>
+          <div class="guide-section-body">
+            <p class="guide-formula">Poder da carta = peso raridade + peso efeito</p>
+            <p>Exemplo: <span class="badge UR">UR</span> com efeito Tier 5 → <strong>4 + 5 = 9</strong>.</p>
+            <p>Se a carta entrar com 2 cópias, essa carta contribui <strong>9 × 2 = 18</strong> para o poder do deck.
+            </p>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Poder do deck e dificuldade</summary>
+          <div class="guide-section-body">
+            <p><strong>Poder do deck</strong> = soma do poder de todas as cópias. O gerador tenta cair na faixa da
+              dificuldade:</p>
+            <table class="guide-table">
+              <thead>
+                <tr>
+                  <th>Dificuldade</th>
+                  <th>Faixa de poder</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>T3 — Mediano</td>
+                  <td><strong>140 – 200</strong></td>
+                </tr>
+                <tr>
+                  <td>T4 — Hard</td>
+                  <td><strong>210 – 280</strong></td>
+                </tr>
+                <tr>
+                  <td>T5 — Ultra Hard</td>
+                  <td><strong>≥ 300</strong> (sem teto)</td>
+                </tr>
+              </tbody>
+            </table>
+            <p>O resumo do deck mostra Cartas, Poder, Tier médio e a composição (Monstro / Magia / Equip / Trap).</p>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Aba Catálogo</summary>
+          <div class="guide-section-body">
+            <ul>
+              <li>Busca por nome ou slug.</li>
+              <li>Filtros por raridade, tipo de carta e Power Tier.</li>
+              <li>Opção <strong>Só com efeito</strong>.</li>
+              <li>Clique numa carta abre o detalhe (arte, pesos, texto de efeito).</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="guide-section">
+          <summary>Aba Efeitos</summary>
+          <div class="guide-section-body">
+            <ul>
+              <li>Lista de efeitos únicos em PT-BR.</li>
+              <li>Pesquisa por palavras (ex.: destrói, dragão).</li>
+              <li>Clica no texto para ver as cartas com esse efeito.</li>
+              <li>Escolhe Tier <strong>3 / 4 / 5</strong> e usa <strong>Salvar tiers de efeito</strong> — volta a gerar
+                decks para aplicar.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
     </article>
   </div>
 
