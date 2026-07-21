@@ -335,11 +335,12 @@ function syncSidePanelBackdrop(): void {
     !el.decksPanel.hidden ||
     !el.pickerPanel.hidden;
   el.deckStage?.classList.toggle("deck-stage--panel-open", anyOpen);
+  const mobile = window.matchMedia("(max-width: 720px)").matches;
   const backdrop = document.getElementById("side-panel-backdrop");
   if (backdrop) {
-    const mobile = window.matchMedia("(max-width: 720px)").matches;
     backdrop.hidden = !anyOpen || !mobile;
   }
+  document.body.style.overflow = anyOpen && mobile ? "hidden" : "";
 }
 
 function ensureSidePanelBackdrop(): HTMLElement {
@@ -408,7 +409,9 @@ function setPickerPanelOpen(open: boolean): void {
     el.pickerPanel.hidden = false;
     renderPicker();
     nudgePickerImages();
-    requestAnimationFrame(() => el.pickerQ.focus());
+    if (!window.matchMedia("(max-width: 720px)").matches) {
+      requestAnimationFrame(() => el.pickerQ.focus());
+    }
   } else {
     el.pickerPanel.hidden = true;
   }
@@ -501,6 +504,7 @@ function buildQtyPopoverEl(card: Card, current: number): HTMLElement {
   if (limit > 1) {
     const quick = document.createElement("div");
     quick.className = "qty-quick";
+    quick.style.setProperty("--qty-cols", String(limit));
     quick.setAttribute("role", "group");
     quick.setAttribute("aria-label", "Atalhos de quantidade");
     for (let n = 1; n <= limit; n++) {
@@ -2207,6 +2211,9 @@ async function boot(): Promise<void> {
   void fetchSavedSeeds();
   void fetchSavedDecks();
   ensureSidePanelBackdrop();
+  window
+    .matchMedia("(max-width: 720px)")
+    .addEventListener("change", syncSidePanelBackdrop);
   syncSaveSeedButton();
   syncDeckActionButtons();
 
