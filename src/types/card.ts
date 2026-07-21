@@ -224,6 +224,35 @@ export interface SavedSeedsFile {
   seeds: SavedSeedEntry[];
 }
 
+/** Metadados opcionais de geração associados a um deck editado. */
+export interface SavedDeckMeta {
+  archetype_id?: string;
+  target_tier?: SelectableTier;
+  gods_mode?: GodsMode;
+  monster_tipo?: string | null;
+  monster_atributo?: string | null;
+  seed?: number;
+  include_spells?: boolean;
+}
+
+/** Deck editado manualmente (lista exacta de cartas + quantidades). */
+export interface SavedDeckEntry {
+  id: string;
+  saved_at: string;
+  label: string;
+  entries: DeckEntry[];
+  composition: DeckComposition;
+  total: number;
+  total_deck_power: number;
+  average_power_tier: number;
+  meta?: SavedDeckMeta;
+}
+
+export interface SavedDecksFile {
+  updated_at?: string | null;
+  decks: SavedDeckEntry[];
+}
+
 export interface DeckResult {
   archetype_id: string;
   target_tier: PowerTier;

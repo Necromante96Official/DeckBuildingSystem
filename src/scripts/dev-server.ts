@@ -11,11 +11,14 @@ import {
   GENERATION_BANS_JSON,
   PUBLIC_DIR,
   ROOT,
+  SAVED_DECKS_JSON,
   SAVED_SEEDS_JSON,
 } from "../lib/paths.ts";
 import type {
   EffectTiersFile,
   GenerationBansFile,
+  SavedDeckEntry,
+  SavedDecksFile,
   SavedSeedEntry,
   SavedSeedsFile,
 } from "../types/card.ts";
@@ -518,6 +521,139 @@ if (isMain()) {
               removed: before !== data.seeds.length,
               count: data.seeds.length,
               seeds: data,
+            }),
+          );
+        } catch (err) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: String(err) }));
+        }
+        return;
+      }
+
+      res.writeHead(405);
+      res.end();
+      return;
+    }
+
+    if (pathOnly === "/api/saved-decks") {
+      function readSavedDecks(): SavedDecksFile {
+        if (fs.existsSync(SAVED_DECKS_JSON)) {
+          try {
+            const data = JSON.parse(
+              fs.readFileSync(SAVED_DECKS_JSON, "utf8"),
+            ) as SavedDecksFile;
+            if (data && Array.isArray(data.decks)) return data;
+          } catch {
+            /* fall through */
+          }
+        }
+        return { updated_at: null, decks: [] };
+      }
+
+      function writeSavedDecks(data: SavedDecksFile): void {
+        fs.mkdirSync(path.dirname(SAVED_DECKS_JSON), { recursive: true });
+        fs.writeFileSync(
+          SAVED_DECKS_JSON,
+          `${JSON.stringify(data, null, 2)}\n`,
+          "utf8",
+        );
+        const distCopy = path.join(DIST_DIR, "data", "saved-decks.json");
+        fs.mkdirSync(path.dirname(distCopy), { recursive: true });
+        fs.copyFileSync(SAVED_DECKS_JSON, distCopy);
+      }
+
+      if (req.method === "GET") {
+        const data = readSavedDecks();
+        res.writeHead(200, {
+          "Content-Type": "application/json; charset=utf-8",
+        });
+        res.end(JSON.stringify(data));
+        return;
+      }
+
+      if (req.method === "POST") {
+        try {
+          const raw = await readBody(req);
+          const body = JSON.parse(raw) as Partial<SavedDeckEntry>;
+          if (
+            !body ||
+            !Array.isArray(body.entries) ||
+            typeof body.total !== "number"
+          ) {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(
+              JSON.stringify({ ok: false, error: "entries/total inválidos" }),
+            );
+            return;
+          }
+          const entry: SavedDeckEntry = {
+            id:
+              typeof body.id === "string" && body.id.trim()
+                ? body.id.trim()
+                : crypto.randomUUID(),
+            saved_at:
+              typeof body.saved_at === "string"
+                ? body.saved_at
+                : new Date().toISOString(),
+            label:
+              typeof body.label === "string" && body.label.trim()
+                ? body.label.trim()
+                : `Deck ${new Date().toLocaleDateString("pt-BR")}`,
+            entries: body.entries as SavedDeckEntry["entries"],
+            composition: (body.composition ||
+              {}) as SavedDeckEntry["composition"],
+            total: body.total,
+            total_deck_power: Number(body.total_deck_power) || 0,
+            average_power_tier: Number(body.average_power_tier) || 0,
+            meta: body.meta,
+          };
+          const data = readSavedDecks();
+          const idx = data.decks.findIndex((d) => d.id === entry.id);
+          if (idx >= 0) data.decks[idx] = entry;
+          else data.decks.unshift(entry);
+          data.updated_at = new Date().toISOString();
+          writeSavedDecks(data);
+          res.writeHead(200, {
+            "Content-Type": "application/json; charset=utf-8",
+          });
+          res.end(
+            JSON.stringify({
+              ok: true,
+              id: entry.id,
+              count: data.decks.length,
+              decks: data,
+            }),
+          );
+        } catch (err) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: String(err) }));
+        }
+        return;
+      }
+
+      if (req.method === "DELETE") {
+        try {
+          const q = new URL(url, "http://127.0.0.1").searchParams;
+          const id = String(q.get("id") || "").trim();
+          if (!id) {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ ok: false, error: "id em falta" }));
+            return;
+          }
+          const data = readSavedDecks();
+          const before = data.decks.length;
+          data.decks = data.decks.filter((d) => d.id !== id);
+          data.updated_at = new Date().toISOString();
+          writeSavedDecks(data);
+          res.writeHead(200, {
+            "Content-Type": "application/json; charset=utf-8",
+          });
+          res.end(
+            JSON.stringify({
+              ok: true,
+              removed: before !== data.decks.length,
+              count: data.decks.length,
+              decks: data,
             }),
           );
         } catch (err) {

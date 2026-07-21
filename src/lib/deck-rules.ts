@@ -175,13 +175,19 @@ export function pickSlotTargets(
   };
 }
 
+export interface AddCopyOpts {
+  maxBombs?: number;
+  /** Permite deck com mais de DECK_SIZE cartas (edição manual). */
+  allowOverSize?: boolean;
+}
+
 export function canAddCopy(
   card: Card,
   state: DeckState,
-  opts?: { maxBombs?: number },
+  opts?: AddCopyOpts,
 ): boolean {
   if (card.card_type === "Field") return false;
-  if (state.total >= DECK_SIZE) return false;
+  if (!opts?.allowOverSize && state.total >= DECK_SIZE) return false;
   const current = state.counts.get(card.slug) || 0;
   if (current >= copyLimit(card)) return false;
 
@@ -204,7 +210,7 @@ export function canAddCopy(
 export function addCopy(
   card: Card,
   state: DeckState,
-  opts?: { maxBombs?: number },
+  opts?: AddCopyOpts,
 ): boolean {
   if (!canAddCopy(card, state, opts)) return false;
   state.counts.set(card.slug, (state.counts.get(card.slug) || 0) + 1);
@@ -251,6 +257,56 @@ export function stateToEntries(state: DeckState): DeckEntry[] {
   return [...state.counts.entries()]
     .map(([slug, copies]) => ({ slug, copies }))
     .sort((a, b) => a.slug.localeCompare(b.slug));
+}
+
+/** Reconstrói DeckState a partir de entradas (ex.: após geração ou carregar deck). */
+export function entriesToDeckState(
+  entries: DeckEntry[],
+  bySlug: Map<string, Card>,
+  opts?: AddCopyOpts,
+): DeckState {
+  const state = createDeckState();
+  for (const e of entries) {
+    const card = bySlug.get(e.slug);
+    if (!card) continue;
+    for (let i = 0; i < e.copies; i++) {
+      addCopy(card, state, opts);
+    }
+  }
+  return state;
+}
+
+/** Remove todas as cópias de uma carta do deck. */
+export function removeAllCopies(card: Card, state: DeckState): boolean {
+  const current = state.counts.get(card.slug) || 0;
+  if (current < 1) return false;
+  for (let i = 0; i < current; i++) {
+    removeCopy(card, state, { protectSupportMins: false });
+  }
+  return true;
+}
+
+/** Define quantidade exacta (0 remove a carta). Respeita copyLimit. */
+export function setCopyCount(
+  card: Card,
+  state: DeckState,
+  target: number,
+  opts?: AddCopyOpts,
+): boolean {
+  const limit = copyLimit(card);
+  const clamped = Math.max(0, Math.min(limit, Math.round(target)));
+  const current = state.counts.get(card.slug) || 0;
+  if (clamped === current) return true;
+  if (clamped > current) {
+    for (let i = current; i < clamped; i++) {
+      if (!addCopy(card, state, opts)) return false;
+    }
+    return true;
+  }
+  for (let i = current; i > clamped; i--) {
+    if (!removeCopy(card, state, { protectSupportMins: false })) return false;
+  }
+  return true;
 }
 
 export function isMonster(card: Card): boolean {

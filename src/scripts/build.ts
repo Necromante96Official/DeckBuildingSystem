@@ -44,6 +44,7 @@ function copyDataAndAssets(): void {
     "effect-tiers.json",
     "generation-bans.json",
     "saved-seeds.json",
+    "saved-decks.json",
   ]) {
     const src = path.join(ROOT, "data", name);
     if (fs.existsSync(src)) {

@@ -161,12 +161,16 @@
             <button type="button" class="btn ghost" id="btn-save-seed" disabled>Salvar seed</button>
             <button type="button" class="btn ghost" id="btn-saved-seeds" aria-expanded="false"
               aria-controls="seeds-panel">Seeds salvas</button>
+            <button type="button" class="btn ghost" id="btn-save-deck" disabled>Salvar deck</button>
+            <button type="button" class="btn ghost" id="btn-saved-decks" aria-expanded="false"
+              aria-controls="decks-panel">Decks salvos</button>
+            <button type="button" class="btn ghost" id="btn-export-deck" disabled>Exportar Excel</button>
           </div>
         </div>
       </div>
 
       <div class="deck-stage">
-        <aside id="seeds-panel" class="seeds-panel" hidden>
+        <aside id="seeds-panel" class="seeds-panel side-panel" hidden>
           <div class="seeds-panel-head">
             <h2>Seeds salvas</h2>
             <button type="button" class="btn ghost seeds-close" id="btn-close-seeds">Fechar</button>
@@ -175,8 +179,30 @@
           <div class="seeds-list" id="seeds-list" role="list"></div>
         </aside>
 
+        <aside id="decks-panel" class="decks-panel side-panel" hidden>
+          <div class="seeds-panel-head">
+            <h2>Decks salvos</h2>
+            <button type="button" class="btn ghost seeds-close" id="btn-close-decks">Fechar</button>
+          </div>
+          <p class="seeds-status" id="decks-status"></p>
+          <div class="seeds-list" id="decks-list" role="list"></div>
+        </aside>
+
+        <aside id="card-picker-panel" class="card-picker-panel side-panel" hidden>
+          <div class="seeds-panel-head">
+            <h2>Adicionar carta</h2>
+            <button type="button" class="btn ghost seeds-close" id="btn-close-picker">Fechar</button>
+          </div>
+          <label class="field search picker-search">
+            <span>Buscar</span>
+            <input type="search" id="picker-q" placeholder="Nome ou slug…" autocomplete="off" />
+          </label>
+          <p class="seeds-status" id="picker-status"></p>
+          <div class="picker-list" id="picker-list" role="list"></div>
+        </aside>
+
         <div class="deck-summary" id="deck-summary" hidden>
-          <div class="sum-item"><b id="sum-total">0</b><span>Cartas</span></div>
+          <div class="sum-item" id="sum-total-item"><b id="sum-total">0/40</b><span>Cartas</span></div>
           <div class="sum-item"><b id="sum-power">—</b><span>Poder</span></div>
           <div class="sum-item"><b id="sum-avg">—</b><span>Tier médio</span></div>
           <div class="sum-item"><b id="sum-mon">0</b><span>Monstro</span></div>
@@ -291,11 +317,17 @@
                 monstros), o gerador reduz automaticamente.</dd>
               <dt>Gerar deck</dt>
               <dd>Cria um deck novo com seed aleatória (ou reutiliza a última).</dd>
-              <dt>Banir carta (×)</dt>
-              <dd>No hover de uma carta do deck, o × remove-a desta combinação raça/atributo e regenera.</dd>
+              <dt>Remover carta (×)</dt>
+              <dd>No hover da arte, o × remove-a e abre o painel de busca para escolher substituto.</dd>
+              <dt>Quantidade</dt>
+              <dd>Clica na <strong>arte</strong> da carta para abrir o seletor de cópias (1–3; deuses: máx. 1).
+                Clica no <strong>nome</strong> para ver os detalhes.</dd>
               <dt>Seeds</dt>
               <dd><strong>Salvar seed</strong> guarda a combinação actual; <strong>Seeds salvas</strong> permite
                 carregar ou apagar.</dd>
+              <dt>Decks editados</dt>
+              <dd><strong>Salvar deck</strong> guarda a lista exacta de cartas; <strong>Decks salvos</strong> carrega
+                sem regenerar. <strong>Exportar Excel</strong> descarrega o deck em .xlsx.</dd>
             </dl>
           </div>
         </details>

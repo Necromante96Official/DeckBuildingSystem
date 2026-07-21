@@ -28,6 +28,7 @@ export const NPC_CALIBRATION_JSON = path.join(DATA_DIR, "npc-calibration.json");
 export const EFFECT_TIERS_JSON = path.join(DATA_DIR, "effect-tiers.json");
 export const GENERATION_BANS_JSON = path.join(DATA_DIR, "generation-bans.json");
 export const SAVED_SEEDS_JSON = path.join(DATA_DIR, "saved-seeds.json");
+export const SAVED_DECKS_JSON = path.join(DATA_DIR, "saved-decks.json");
 export const SOURCE_NPC_XLSX = path.join(DATA_DIR, "source", "NPC-deck.xlsx");
 
 export const ASSETS_GRANDE = path.join(ROOT, "assets", "cartas_grande");
