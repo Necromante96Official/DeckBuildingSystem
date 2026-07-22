@@ -595,6 +595,25 @@ body {
   min-height: 1.1em;
 }
 
+.deck-toolbar {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0 0 0.65rem;
+}
+
+.deck-add-btn {
+  min-height: 2.55rem;
+}
+
+.filter-archetype {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
+.filter-archetype .chips {
+  flex-wrap: wrap;
+}
+
 /* ——— Deck board ——— */
 .deck-board {
   flex: 1;
@@ -1508,6 +1527,15 @@ body {
     grid-column: span 2;
     margin-bottom: 0.35rem;
     z-index: 5;
+  }
+
+  .deck-toolbar {
+    width: 100%;
+  }
+
+  .deck-add-btn {
+    width: 100%;
+    min-height: 44px;
   }
 
   .deck-slot-art .ban-card {

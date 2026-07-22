@@ -15241,6 +15241,40 @@
       "def": "5000",
       "desc_pt": "EFEITO: Esta carta não é afetada por efeitos de Monstros, SPELLS e TRAPS. Quando esta carta for invocada, role um dado de seis faces. Se o resultado for: 1: Você vence o Duelo. 2 ou 3: Seu oponente perde metade dos Pontos de Vida. 4 ou 5: Destrua todas as cartas do oponente. 6: Destrua esta carta e, se isso acontecer, você perde metade dos seus Pontos de Vida.",
       "desc_en": "EFFECT: This card is unaffected by monster, Spell, and Trap effects. When this card is summoned, roll a six-sided die. Apply the result: 1: You win the Duel. 2 or 3: Your opponent loses half their Life Points. 4 or 5: Destroy all cards your opponent controls. 6: Destroy this card, and if you do, you lose half your Life Points."
+    },
+    {
+      "nome": "Lord of Souls",
+      "nome_pt": "Lord of Souls",
+      "slug": "lord_of_souls",
+      "card_type": "Monster",
+      "tipo": "Zombie",
+      "atributo": "DARK",
+      "raridade": "UR",
+      "raridade_arquivo": "UR",
+      "icone_atributo": "DARK",
+      "icone_tipo": "zombie",
+      "nivel": "8",
+      "atk": "0",
+      "def": "0",
+      "desc_pt": "EFEITO: Quando invocada, essa carta ganha 350 atk e def para cada carta em ambos os cemitérios. Quando for destruída, remova 3 cartas do topo do seu deck para o cemitério, essa carta volta para o campo.",
+      "desc_en": "EFFECT: When summoned, this card gains 350 ATK and DEF for each card in both Graveyards. When destroyed, send the top 3 cards of your Deck to the Graveyard; this card returns to the field."
+    },
+    {
+      "nome": "Red-Eyes Absolut Darkness Dragon",
+      "nome_pt": "Red-Eyes Absolut Darkness Dragon",
+      "slug": "red-eyes-absolut-darkness-dragon",
+      "card_type": "Monster",
+      "tipo": "Dragon",
+      "atributo": "FIRE",
+      "raridade": "UR",
+      "raridade_arquivo": "UR",
+      "icone_atributo": "FIRE",
+      "icone_tipo": "dragon",
+      "nivel": "10",
+      "atk": "3600",
+      "def": "4000",
+      "desc_pt": "EFEITO: Sempre que o seu oponente ativar uma Carta de Magia, Equip ou Armadilha, negue o efeito dela e coloque um Marcador nesta carta. Para cada marcador, ela ganha 350 de ATK e DEF. Os seguintes efeitos adicionais são obtidos com: 3 Marcadores: Pode atacar 2 vezes. 6 Marcadores: Pode atacar 3 vezes. 9 Marcadores: Não pode ser destruída em batalha.",
+      "desc_en": "EFFECT: Whenever your opponent activates a Spell, Equip, or Trap Card, negate its effect and place a Counter on this card. For each counter, it gains 350 ATK and DEF. Additional effects: 3 Counters: It can attack twice. 6 Counters: It can attack three times. 9 Counters: It cannot be destroyed in battle."
     }
   ]
 }

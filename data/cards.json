@@ -2,8 +2,8 @@
   "gerado_de": "Data/cartas_runtime.json",
   "versao": "1784056296",
   "fonte": "data/source/catalogo.json",
-  "gerado_em": "2026-07-21T21:33:45.009Z",
-  "total": 982,
+  "gerado_em": "2026-07-22T21:55:28.704Z",
+  "total": 984,
   "cartas": [
     {
       "slug": "30000-year_white_turtle",
@@ -15125,13 +15125,13 @@
       "desc_pt": "EFEITO: Dobra o poder atual do monstro equipado com esta carta.",
       "desc_en": "EFFECT: Double the current power of the monster equipped with this card.",
       "effect_tags": [
-        "soft_effect"
+        "explosive_equip"
       ],
-      "effect_weight": 2,
+      "effect_weight": 4,
       "rarity_weight": 4,
       "body_weight": 1,
-      "power_tier": 4,
-      "card_power": 7
+      "power_tier": 5,
+      "card_power": 8
     },
     {
       "slug": "megarock_dragon",
@@ -17573,13 +17573,13 @@
       "desc_pt": "EFEITO: Se esta carta batalhar contra um monstro DARK, seu ATK será dobrado apenas durante a Etapa de Dano.",
       "desc_en": "EFFECT: If this card battles a DARK monster, its ATK is doubled only during the Damage Step.",
       "effect_tags": [
-        "soft_effect"
+        "explosive_equip"
       ],
-      "effect_weight": 2,
+      "effect_weight": 4,
       "rarity_weight": 4,
       "body_weight": 4,
       "power_tier": 4,
-      "card_power": 7
+      "card_power": 8
     },
     {
       "slug": "panther_warrior",
@@ -26252,6 +26252,69 @@
         "board_wipe",
         "strong_immunity",
         "win_condition"
+      ],
+      "effect_weight": 5,
+      "rarity_weight": 4,
+      "body_weight": 5,
+      "power_tier": 5,
+      "card_power": 9
+    },
+    {
+      "slug": "lord_of_souls",
+      "nome": "Lord of Souls",
+      "nome_pt": "Lord of Souls",
+      "card_type": "Monster",
+      "tipo": "Zombie",
+      "atributo": "DARK",
+      "raridade": "UR",
+      "raridade_arquivo": "UR",
+      "has_effect": true,
+      "image": "assets/cartas_grande/lord_of_souls.webp",
+      "image_status": "ok",
+      "icone_atributo": "DARK",
+      "icone_tipo": "zombie",
+      "nivel": "8",
+      "atk": "0",
+      "def": "0",
+      "desc_pt": "EFEITO: Quando invocada, essa carta ganha 350 atk e def para cada carta em ambos os cemitérios. Quando for destruída, remova 3 cartas do topo do seu deck para o cemitério, essa carta volta para o campo.",
+      "desc_en": "EFFECT: When summoned, this card gains 350 ATK and DEF for each card in both Graveyards. When destroyed, send the top 3 cards of your Deck to the Graveyard; this card returns to the field.",
+      "effect_tags": [
+        "attack_boost",
+        "removal_control",
+        "tutor_summon"
+      ],
+      "effect_weight": 4,
+      "rarity_weight": 4,
+      "body_weight": 1,
+      "power_tier": 5,
+      "card_power": 8
+    },
+    {
+      "slug": "red-eyes-absolut-darkness-dragon",
+      "nome": "Red-Eyes Absolut Darkness Dragon",
+      "nome_pt": "Red-Eyes Absolut Darkness Dragon",
+      "card_type": "Monster",
+      "tipo": "Dragon",
+      "atributo": "FIRE",
+      "raridade": "UR",
+      "raridade_arquivo": "UR",
+      "has_effect": true,
+      "image": "assets/cartas_grande/red-eyes-absolut-darkness-dragon.webp",
+      "image_status": "ok",
+      "icone_atributo": "FIRE",
+      "icone_tipo": "dragon",
+      "nivel": "10",
+      "atk": "3600",
+      "def": "4000",
+      "desc_pt": "EFEITO: Sempre que o seu oponente ativar uma Carta de Magia, Equip ou Armadilha, negue o efeito dela e coloque um Marcador nesta carta. Para cada marcador, ela ganha 350 de ATK e DEF. Os seguintes efeitos adicionais são obtidos com: 3 Marcadores: Pode atacar 2 vezes. 6 Marcadores: Pode atacar 3 vezes. 9 Marcadores: Não pode ser destruída em batalha.",
+      "desc_en": "EFFECT: Whenever your opponent activates a Spell, Equip, or Trap Card, negate its effect and place a Counter on this card. For each counter, it gains 350 ATK and DEF. Additional effects: 3 Counters: It can attack twice. 6 Counters: It can attack three times. 9 Counters: It cannot be destroyed in battle.",
+      "effect_tags": [
+        "attack_boost",
+        "attack_negation",
+        "multi_attack",
+        "spell_negation",
+        "strong_immunity",
+        "triple_attack"
       ],
       "effect_weight": 5,
       "rarity_weight": 4,

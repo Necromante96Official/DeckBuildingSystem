@@ -57,10 +57,10 @@
       <div class="control-surface">
         <div class="create-controls">
           <div class="filter-group filter-theme">
-            <label class="field">
-              <span>Arquetípico</span>
-              <select id="archetype"></select>
-            </label>
+            <div class="chip-group filter-archetype">
+              <span class="chip-label">Arquetípico</span>
+              <div class="chips" id="archetype-chips" role="group" aria-label="Arquetípico"></div>
+            </div>
             <label class="field" id="field-monster-tipo">
               <span>Tipo</span>
               <select id="monster-tipo">
@@ -213,6 +213,10 @@
         <p class="gen-meta" id="gen-meta">Em Por tipo, escolhe raça e/ou atributo; depois gera o deck.</p>
         <p class="warnings" id="deck-warnings"></p>
 
+        <div class="deck-toolbar" id="deck-toolbar" hidden>
+          <button type="button" class="btn ghost deck-add-btn" id="btn-add-card">Adicionar carta</button>
+        </div>
+
         <div class="deck-board" id="deck-grid" aria-label="Deck gerado"></div>
       </div>
     </section>
@@ -317,8 +321,11 @@
                 monstros), o gerador reduz automaticamente.</dd>
               <dt>Gerar deck</dt>
               <dd>Cria um deck novo com seed aleatória (ou reutiliza a última).</dd>
+              <dt>Adicionar carta</dt>
+              <dd>Usa o botão <strong>Adicionar carta</strong> para abrir o painel lateral e incluir cartas no deck
+                (respeita o limite de cópias).</dd>
               <dt>Remover carta (×)</dt>
-              <dd>No hover da arte, o × remove-a e abre o painel de busca para escolher substituto.</dd>
+              <dd>O × na arte remove a carta do deck (sem abrir o painel).</dd>
               <dt>Quantidade</dt>
               <dd>Clica na <strong>arte</strong> da carta para abrir o seletor de cópias (1–3; deuses: máx. 1).
                 Clica no <strong>nome</strong> para ver os detalhes.</dd>

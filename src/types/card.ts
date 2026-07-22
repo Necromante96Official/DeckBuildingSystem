@@ -200,7 +200,9 @@ export interface SavedSeedEntry {
   seed: number;
   label?: string;
   options: {
-    archetypeId: string;
+    /** @deprecated use archetypeIds */
+    archetypeId?: string;
+    archetypeIds?: string[];
     targetTier: SelectableTier;
     godsMode: GodsMode;
     monsterTipo: string | null;
@@ -226,7 +228,9 @@ export interface SavedSeedsFile {
 
 /** Metadados opcionais de geração associados a um deck editado. */
 export interface SavedDeckMeta {
+  /** @deprecated use archetype_ids */
   archetype_id?: string;
+  archetype_ids?: string[];
   target_tier?: SelectableTier;
   gods_mode?: GodsMode;
   monster_tipo?: string | null;

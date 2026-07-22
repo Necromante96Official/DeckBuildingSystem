@@ -1,19 +1,19 @@
 {
-  "gerado_em": "2026-07-21T21:33:45.442Z",
+  "gerado_em": "2026-07-22T21:55:28.998Z",
   "versao": "1784056296",
-  "total_cartas": 982,
-  "com_arte": 982,
+  "total_cartas": 984,
+  "com_arte": 984,
   "sem_arte": 0,
-  "com_efeito": 424,
+  "com_efeito": 426,
   "sem_efeito": 558,
   "por_raridade": {
     "R": 264,
     "N": 363,
-    "UR": 194,
+    "UR": 196,
     "SR": 161
   },
   "por_card_type": {
-    "Monster": 869,
+    "Monster": 871,
     "Trap": 33,
     "Equip": 46,
     "Spell": 28,
@@ -23,8 +23,8 @@
     "1": 520,
     "2": 143,
     "3": 96,
-    "4": 102,
-    "5": 121
+    "4": 101,
+    "5": 124
   },
   "missing_images": [],
   "orphan_images": []

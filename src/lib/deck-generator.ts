@@ -40,7 +40,8 @@ import {
 export interface GenerateDeckOptions {
   cards: Card[];
   archetypes: ArchetypeIndex;
-  archetypeId: string;
+  /** Um ou mais arquétipos; use ["livre"] para Por tipo. */
+  archetypeIds: string[];
   targetTier: SelectableTier;
   godsMode?: GodsMode;
   seed?: number;
@@ -80,6 +81,11 @@ const USEFUL_SUPPORT_TAGS = new Set([
   "win_condition",
 ]);
 
+const T5_STAPLE_SLUGS: { slug: string; kind: SlotKind }[] = [
+  { slug: "dark_hole", kind: "spell" },
+  { slug: "megamorph", kind: "equip" },
+];
+
 function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
@@ -105,10 +111,41 @@ function resolveArchetype(
 /** Livre = entry livre real (sem auto-pick de arquetípico). */
 export function resolveTheme(
   index: ArchetypeIndex,
-  requestedId: string,
-): { arch: ArchetypeIndexEntry; isLivre: boolean } {
-  const requested = resolveArchetype(index, requestedId);
-  return { arch: requested, isLivre: Boolean(requested.livre) };
+  requestedIds: string[],
+): {
+  arch: ArchetypeIndexEntry;
+  isLivre: boolean;
+  activeIds: Set<string>;
+} {
+  const unique = [...new Set(requestedIds.length ? requestedIds : ["livre"])];
+  if (unique.includes("livre") || unique.length === 0) {
+    const livre = resolveArchetype(index, "livre");
+    return { arch: livre, isLivre: true, activeIds: new Set(["livre"]) };
+  }
+  if (unique.length === 1) {
+    const arch = resolveArchetype(index, unique[0]!);
+    return { arch, isLivre: false, activeIds: new Set(unique) };
+  }
+  const entries = unique.map((id) => resolveArchetype(index, id));
+  const mergedSlugs = new Set(entries.flatMap((e) => e.slugs));
+  const mergedSupport = new Set(entries.flatMap((e) => e.support_slugs));
+  const other = new Set<string>();
+  for (const e of index.entries) {
+    if (e.livre || unique.includes(e.id)) continue;
+    for (const s of e.slugs) {
+      if (!mergedSlugs.has(s) && !mergedSupport.has(s)) other.add(s);
+    }
+  }
+  const merged: ArchetypeIndexEntry = {
+    id: unique.join("+"),
+    label: entries.map((e) => e.label).join(" + "),
+    livre: false,
+    synergy_tipos: [...new Set(entries.flatMap((e) => e.synergy_tipos))],
+    slugs: [...mergedSlugs],
+    support_slugs: [...mergedSupport],
+    other_arch_slugs: [...other].sort(),
+  };
+  return { arch: merged, isLivre: false, activeIds: new Set(unique) };
 }
 
 function norm(s: string): string {
@@ -150,10 +187,12 @@ function mentionsForeignArchetype(
   card: Card,
   arch: ArchetypeIndexEntry,
   allEntries: ArchetypeIndexEntry[],
+  activeArchIds?: Set<string>,
 ): boolean {
   const text = cardText(card);
   for (const other of allEntries) {
     if (other.livre || other.id === arch.id) continue;
+    if (activeArchIds?.has(other.id)) continue;
     const keys = [other.label, other.id.replace(/_/g, " ")];
     if (other.id.includes("red_eyes")) keys.push("red-eyes", "red eyes");
     if (other.id.includes("blue_eyes")) keys.push("blue-eyes", "blue eyes");
@@ -224,6 +263,7 @@ function buildPool(
   allEntries: ArchetypeIndexEntry[],
   monsterTipo?: string | null,
   monsterAtributo?: string | null,
+  activeArchIds?: Set<string>,
 ): BuiltPool {
   if (arch.livre) return buildLivrePool(cards, monsterTipo, monsterAtributo);
 
@@ -255,7 +295,7 @@ function buildPool(
     if (!noField(c)) continue;
     if (coreSlugs.has(c.slug) || supportSlugs.has(c.slug)) continue;
     if (otherArch.has(c.slug)) continue;
-    if (mentionsForeignArchetype(c, arch, allEntries) && !referencesCore(c, core)) {
+    if (mentionsForeignArchetype(c, arch, allEntries, activeArchIds) && !referencesCore(c, core)) {
       continue;
     }
 
@@ -283,6 +323,41 @@ function buildPool(
   }
 
   return { core, support, fillerMonsters };
+}
+
+function buildMergedPool(
+  cards: Card[],
+  ids: string[],
+  allEntries: ArchetypeIndexEntry[],
+  monsterTipo?: string | null,
+  monsterAtributo?: string | null,
+): BuiltPool {
+  const active = new Set(ids);
+  const coreMap = new Map<string, Card>();
+  const supportMap = new Map<string, Card>();
+  const fillerMap = new Map<string, Card>();
+  for (const id of ids) {
+    const arch = resolveArchetype(
+      { entries: allEntries, gerado_em: "" },
+      id,
+    );
+    const pool = buildPool(
+      cards,
+      arch,
+      allEntries,
+      monsterTipo,
+      monsterAtributo,
+      active,
+    );
+    for (const c of pool.core) coreMap.set(c.slug, c);
+    for (const c of pool.support) supportMap.set(c.slug, c);
+    for (const c of pool.fillerMonsters) fillerMap.set(c.slug, c);
+  }
+  return {
+    core: [...coreMap.values()],
+    support: [...supportMap.values()],
+    fillerMonsters: [...fillerMap.values()],
+  };
 }
 
 function normTipo(t: string | undefined): string {
@@ -604,6 +679,7 @@ function synergyScore(
   allEntries: ArchetypeIndexEntry[],
   themeTipo?: string | null,
   themeAtributo?: string | null,
+  activeArchIds?: Set<string>,
 ): number {
   let score = 0;
   const isLivre = arch.livre;
@@ -613,7 +689,9 @@ function synergyScore(
   if (!isLivre) {
     if (coreSet.has(candidate.slug)) score += 55;
     if (otherArch.has(candidate.slug)) score -= 250;
-    if (mentionsForeignArchetype(candidate, arch, allEntries)) score -= 80;
+    if (mentionsForeignArchetype(candidate, arch, allEntries, activeArchIds)) {
+      score -= 80;
+    }
   }
 
   const pt = candidate.power_tier || 1;
@@ -880,9 +958,9 @@ export function generateDeck(options: GenerateDeckOptions): DeckResult {
   const godsMode: GodsMode = options.godsMode ?? "off";
   const includeSpells = options.includeSpells !== false;
   const exactSlots = options.slotTargets ?? null;
-  const { arch, isLivre } = resolveTheme(
+  const { arch, isLivre, activeIds } = resolveTheme(
     options.archetypes,
-    options.archetypeId,
+    options.archetypeIds,
   );
   const monsterTipo =
     isLivre && options.monsterTipo ? String(options.monsterTipo).trim() : null;
@@ -918,13 +996,16 @@ export function generateDeck(options: GenerateDeckOptions): DeckResult {
     };
   }
 
-  const { core, support, fillerMonsters } = buildPool(
-    options.cards,
-    arch,
-    options.archetypes.entries,
-    monsterTipo,
-    monsterAtributo,
-  );
+  const pool = isLivre
+    ? buildLivrePool(options.cards, monsterTipo, monsterAtributo)
+    : buildMergedPool(
+      options.cards,
+      [...activeIds],
+      options.archetypes.entries,
+      monsterTipo,
+      monsterAtributo,
+    );
+  const { core, support, fillerMonsters } = pool;
   const coreSet = new Set(core.map((c) => c.slug));
   const otherArch = isLivre
     ? new Set<string>()
@@ -1036,6 +1117,7 @@ export function generateDeck(options: GenerateDeckOptions): DeckResult {
       options.archetypes.entries,
       themeTipo,
       themeAtributo,
+      activeIds,
     );
   }
 
@@ -1321,6 +1403,28 @@ export function generateDeck(options: GenerateDeckOptions): DeckResult {
     maybeLockAxis();
   }
   maybeLockAxis();
+
+  if (target === 5) {
+    for (const staple of T5_STAPLE_SLUGS) {
+      if (targets[staple.kind] <= 0) continue;
+      const card = bySlug.get(staple.slug);
+      if (!card) {
+        warnings.push(`Staple T5 ${staple.slug} não encontrada no catálogo.`);
+        continue;
+      }
+      if (banned.has(staple.slug.toLowerCase())) {
+        warnings.push(`Staple T5 ${card.nome_pt || card.nome} banida nesta config.`);
+        continue;
+      }
+      if (deckList.some((c) => c.slug === staple.slug)) continue;
+      const added = tryAdd(card, 1, { allowSupportFloor: true });
+      if (added === 0) {
+        warnings.push(
+          `Não foi possível incluir staple T5 ${card.nome_pt || card.nome}.`,
+        );
+      }
+    }
+  }
 
   // —— Phase 1: quotas Equip/Trap/Spell (exactas = nunca baixar o alvo sem necessidade) ——
   const stuckKinds = new Set<SlotKind>();

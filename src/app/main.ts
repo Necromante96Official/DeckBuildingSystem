@@ -59,6 +59,7 @@ const state = {
   qtyPopoverSlug: null as string | null,
   savedDecks: [] as SavedDeckEntry[],
   lastSeed: null as number | null,
+  selectedArchetypes: new Set<string>(["livre"]),
 };
 
 const el = {
@@ -68,7 +69,9 @@ const el = {
   panelCreate: document.getElementById("panel-create")!,
   panelCatalog: document.getElementById("panel-catalog")!,
   panelEffects: document.getElementById("panel-effects")!,
-  archetype: document.getElementById("archetype") as HTMLSelectElement,
+  archetypeChips: document.getElementById("archetype-chips")!,
+  deckToolbar: document.getElementById("deck-toolbar")!,
+  btnAddCard: document.getElementById("btn-add-card") as HTMLButtonElement,
   monsterTipo: document.getElementById("monster-tipo") as HTMLSelectElement,
   fieldMonsterTipo: document.getElementById("field-monster-tipo")!,
   monsterAttr: document.getElementById("monster-attr") as HTMLSelectElement,
@@ -220,6 +223,42 @@ function syncDeckActionButtons(): void {
   const hasDeck = Boolean(state.editableDeck && state.editableDeck.total > 0);
   el.btnSaveDeck.disabled = !hasDeck;
   el.btnExportDeck.disabled = !hasDeck;
+  el.btnAddCard.disabled = !state.editableDeck;
+  el.deckToolbar.hidden = !state.editableDeck;
+}
+
+function normalizeSeedArchetypeIds(
+  o: Pick<SavedSeedEntry["options"], "archetypeIds" | "archetypeId">,
+): string[] {
+  if (o.archetypeIds?.length) return [...o.archetypeIds];
+  if (o.archetypeId) return [o.archetypeId];
+  return ["livre"];
+}
+
+function archetypeIdsLabel(ids: string[]): string {
+  if (!state.archetypes) return ids.join("+");
+  if (ids.includes("livre")) return "Por tipo";
+  return ids
+    .map((id) => state.archetypes!.entries.find((e) => e.id === id)?.label || id)
+    .join(" + ");
+}
+
+function getSelectedArchetypeIds(): string[] {
+  const ids = [...state.selectedArchetypes];
+  if (ids.includes("livre")) return ["livre"];
+  return ids.length ? ids : ["livre"];
+}
+
+function isPorTipoMode(): boolean {
+  return getSelectedArchetypeIds().includes("livre");
+}
+
+function setArchetypeSelection(ids: string[]): void {
+  state.selectedArchetypes.clear();
+  for (const id of ids) state.selectedArchetypes.add(id);
+  renderArchetypeChips();
+  syncTipoVisibility();
+  persistUi();
 }
 
 function manualEffectMap(): Map<string, PowerTier> {
@@ -676,18 +715,19 @@ function buildDeckSlotWrap(entry: DeckEntry, index: number): HTMLElement {
   removeBtn.className = "ban-card";
   removeBtn.setAttribute("role", "button");
   removeBtn.tabIndex = 0;
-  removeBtn.title = "Remover carta e escolher substituto";
+  removeBtn.title = "Remover carta do deck";
+  removeBtn.setAttribute("aria-label", "Remover carta do deck");
   removeBtn.textContent = "×";
   removeBtn.addEventListener("click", (ev) => {
     ev.preventDefault();
     ev.stopPropagation();
-    removeCardAndOpenPicker(c.slug);
+    removeCardFromDeck(c.slug);
   });
   removeBtn.addEventListener("keydown", (ev) => {
     if (ev.key === "Enter" || ev.key === " ") {
       ev.preventDefault();
       ev.stopPropagation();
-      removeCardAndOpenPicker(c.slug);
+      removeCardFromDeck(c.slug);
     }
   });
 
@@ -766,10 +806,11 @@ function formatSeedDate(iso: string): string {
 
 function autoSeedLabel(entry: Pick<SavedSeedEntry, "options" | "seed">): string {
   const o = entry.options;
+  const archIds = normalizeSeedArchetypeIds(o);
   const theme =
     o.monsterTipo || o.monsterAtributo
       ? [o.monsterTipo, o.monsterAtributo].filter(Boolean).join("/")
-      : o.archetypeId;
+      : archetypeIdsLabel(archIds);
   return `${theme} T${o.targetTier} · ${o.slotTargets.spell}/${o.slotTargets.equip}/${o.slotTargets.trap} · #${entry.seed}`;
 }
 
@@ -799,7 +840,7 @@ function renderSavedSeeds(): void {
     meta.innerHTML = escapeHtml(
       [
         `Seed ${s.seed} · ${formatSeedDate(s.saved_at)}`,
-        `${o.archetypeId}${o.monsterTipo ? ` · ${o.monsterTipo}` : ""}${o.monsterAtributo ? ` · ${o.monsterAtributo}` : ""}`,
+        `${archetypeIdsLabel(normalizeSeedArchetypeIds(o))}${o.monsterTipo ? ` · ${o.monsterTipo}` : ""}${o.monsterAtributo ? ` · ${o.monsterAtributo}` : ""}`,
         `T${o.targetTier} · ${gods} · Magia ${o.slotTargets.spell} · Equip ${o.slotTargets.equip} · Trap ${o.slotTargets.trap}`,
         `${r.total} cartas · poder ${r.total_deck_power} · tier méd. ${r.average_power_tier}`,
         `M${r.composition.monster} / Mg${r.composition.spell} / Eq${r.composition.equip} / Tr${r.composition.trap}`,
@@ -954,7 +995,8 @@ async function saveCurrentDeck(): Promise<void> {
     total_deck_power: snap.total_deck_power,
     average_power_tier: snap.average_power_tier,
     meta: {
-      archetype_id: deck.archetype_id,
+      archetype_ids: getSelectedArchetypeIds(),
+      archetype_id: getSelectedArchetypeIds().join("+"),
       target_tier: deck.target_tier as SelectableTier,
       gods_mode: deck.gods_mode,
       monster_tipo: deck.monster_tipo ?? null,
@@ -1039,8 +1081,12 @@ async function deleteSavedDeck(id: string): Promise<void> {
 
 function loadSavedDeck(entry: SavedDeckEntry): void {
   const meta = entry.meta;
-  if (meta?.archetype_id) el.archetype.value = meta.archetype_id;
-  syncTipoVisibility();
+  const metaIds = meta?.archetype_ids?.length
+    ? meta.archetype_ids
+    : meta?.archetype_id
+      ? [meta.archetype_id]
+      : ["livre"];
+  setArchetypeSelection(metaIds);
   if (meta?.monster_tipo != null) el.monsterTipo.value = meta.monster_tipo;
   if (meta?.monster_atributo != null) el.monsterAttr.value = meta.monster_atributo;
   if (meta?.target_tier) el.tier.value = String(meta.target_tier);
@@ -1048,7 +1094,7 @@ function loadSavedDeck(entry: SavedDeckEntry): void {
 
   state.editableDeck = entriesToDeckState(entry.entries, state.bySlug, EDIT_OPTS);
   state.deck = {
-    archetype_id: meta?.archetype_id || el.archetype.value || "livre",
+    archetype_id: metaIds.join("+"),
     target_tier: meta?.target_tier || 3,
     gods_mode: meta?.gods_mode || "off",
     total: entry.total,
@@ -1150,6 +1196,24 @@ function renderPicker(): void {
   if (!el.pickerPanel.hidden) nudgePickerImages();
 }
 
+function openPickerPanel(): void {
+  if (!state.editableDeck) return;
+  state.pickerQ = "";
+  el.pickerQ.value = "";
+  setPickerPanelOpen(true);
+}
+
+function removeCardFromDeck(slug: string): void {
+  if (!state.editableDeck) return;
+  const card = state.bySlug.get(slug);
+  if (!card) return;
+  removeAllCopies(card, state.editableDeck);
+  closeQtyPopover();
+  applyEditableToDisplay();
+  renderDeckMeta();
+  renderDeckGrid(false);
+}
+
 function addCardFromPicker(slug: string): void {
   if (!state.editableDeck) return;
   const card = state.bySlug.get(slug);
@@ -1164,26 +1228,12 @@ function addCardFromPicker(slug: string): void {
   el.pickerStatus.textContent = `${card.nome_pt || card.nome} adicionada.`;
 }
 
-function removeCardAndOpenPicker(slug: string): void {
-  if (!state.editableDeck) return;
-  const card = state.bySlug.get(slug);
-  if (!card) return;
-  removeAllCopies(card, state.editableDeck);
-  closeQtyPopover();
-  applyEditableToDisplay();
-  renderDeckMeta();
-  renderDeckGrid(false);
-  state.pickerQ = "";
-  el.pickerQ.value = "";
-  setPickerPanelOpen(true);
-}
-
 async function saveCurrentSeed(): Promise<void> {
   const deck = state.deck;
   if (!deck) return;
   applyEditableToDisplay();
   const snap = buildEditableSnapshot();
-  const archId = el.archetype.value || deck.archetype_id || "livre";
+  const archIds = getSelectedArchetypeIds();
   const tier = Number(el.tier.value) as SelectableTier;
   const godsRaw = el.godsMode.value;
   const godsMode: GodsMode =
@@ -1202,7 +1252,7 @@ async function saveCurrentSeed(): Promise<void> {
     label: autoSeedLabel({
       seed: deck.seed,
       options: {
-        archetypeId: archId,
+        archetypeIds: archIds,
         targetTier: tier,
         godsMode,
         monsterTipo: el.monsterTipo.value.trim() || null,
@@ -1212,7 +1262,7 @@ async function saveCurrentSeed(): Promise<void> {
       },
     }),
     options: {
-      archetypeId: archId,
+      archetypeIds: archIds,
       targetTier: tier === 3 || tier === 4 || tier === 5 ? tier : deck.target_tier as SelectableTier,
       godsMode: deck.gods_mode || godsMode,
       monsterTipo: deck.monster_tipo || el.monsterTipo.value.trim() || null,
@@ -1310,8 +1360,7 @@ async function deleteSavedSeed(id: string): Promise<void> {
 
 function loadSavedSeed(entry: SavedSeedEntry): void {
   const o = entry.options;
-  if (o.archetypeId) el.archetype.value = o.archetypeId;
-  syncTipoVisibility();
+  setArchetypeSelection(normalizeSeedArchetypeIds(o));
   if (o.monsterTipo != null) el.monsterTipo.value = o.monsterTipo;
   if (o.monsterAtributo != null) el.monsterAttr.value = o.monsterAtributo;
   el.tier.value = String(o.targetTier);
@@ -1360,7 +1409,9 @@ const SESSION_KEY = "fl_criacao_deck_ui_v1";
 type SavedUi = {
   tab: "create" | "catalog" | "effects";
   scrollY: number;
-  archetype: string;
+  /** @deprecated */
+  archetype?: string;
+  archetypeIds: string[];
   monsterTipo: string;
   monsterAttr: string;
   tier: string;
@@ -1390,7 +1441,7 @@ function collectUi(): SavedUi {
   return {
     tab: activeTab(),
     scrollY: window.scrollY || 0,
-    archetype: el.archetype.value,
+    archetypeIds: getSelectedArchetypeIds(),
     monsterTipo: el.monsterTipo.value,
     monsterAttr: el.monsterAttr.value,
     tier: el.tier.value,
@@ -1842,9 +1893,8 @@ function runGenerate(seed?: number): void {
     el.genMeta.textContent = "Escolhe Tier 3, 4 ou 5.";
     return;
   }
-  const archId = el.archetype.value || "livre";
-  const archEntry = state.archetypes.entries.find((e) => e.id === archId);
-  const isPorTipo = Boolean(archEntry?.livre);
+  const archIds = getSelectedArchetypeIds();
+  const isPorTipo = isPorTipoMode();
   const monsterTipo = el.monsterTipo.value.trim();
   const monsterAtributo = el.monsterAttr.value.trim();
   if (isPorTipo && !monsterTipo && !monsterAtributo) {
@@ -1860,7 +1910,7 @@ function runGenerate(seed?: number): void {
   const result = generateDeck({
     cards: state.cards,
     archetypes: state.archetypes,
-    archetypeId: archId,
+    archetypeIds: archIds,
     targetTier: tier,
     godsMode,
     seed: seed ?? freshSeed(),
@@ -1961,9 +2011,7 @@ function fillMonsterAttrs(): void {
 }
 
 function syncTipoVisibility(): void {
-  const id = el.archetype.value || "livre";
-  const entry = state.archetypes?.entries.find((e) => e.id === id);
-  const show = Boolean(entry?.livre);
+  const show = isPorTipoMode();
   el.fieldMonsterTipo.hidden = !show;
   el.monsterTipo.disabled = !show;
   el.fieldMonsterAttr.hidden = !show;
@@ -1974,17 +2022,48 @@ function syncTipoVisibility(): void {
   }
 }
 
+function renderArchetypeChips(): void {
+  if (!state.archetypes) return;
+  el.archetypeChips.innerHTML = "";
+  for (const e of state.archetypes.entries) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "chip";
+    btn.textContent = e.livre ? "Por tipo" : e.label;
+    btn.dataset.id = e.id;
+    btn.setAttribute(
+      "aria-pressed",
+      state.selectedArchetypes.has(e.id) ? "true" : "false",
+    );
+    btn.addEventListener("click", () => {
+      if (e.livre) {
+        state.selectedArchetypes.clear();
+        state.selectedArchetypes.add("livre");
+      } else {
+        state.selectedArchetypes.delete("livre");
+        if (state.selectedArchetypes.has(e.id)) {
+          state.selectedArchetypes.delete(e.id);
+          if (state.selectedArchetypes.size === 0) {
+            state.selectedArchetypes.add("livre");
+          }
+        } else {
+          state.selectedArchetypes.add(e.id);
+        }
+      }
+      renderArchetypeChips();
+      syncTipoVisibility();
+      persistUi();
+    });
+    el.archetypeChips.appendChild(btn);
+  }
+}
+
 function fillArchetypes(): void {
   if (!state.archetypes) return;
-  el.archetype.innerHTML = "";
-  for (const e of state.archetypes.entries) {
-    const opt = document.createElement("option");
-    opt.value = e.id;
-    opt.textContent = e.livre
-      ? "Por tipo"
-      : `${e.label} (${e.slugs.length})`;
-    el.archetype.appendChild(opt);
+  if (state.selectedArchetypes.size === 0) {
+    state.selectedArchetypes.add("livre");
   }
+  renderArchetypeChips();
   syncTipoVisibility();
 }
 
@@ -2066,8 +2145,12 @@ async function boot(): Promise<void> {
 
   const saved = loadSavedUi();
   if (saved) {
-    if (saved.archetype) el.archetype.value = saved.archetype;
-    syncTipoVisibility();
+    const restoredIds = saved.archetypeIds?.length
+      ? saved.archetypeIds
+      : saved.archetype
+        ? [saved.archetype]
+        : ["livre"];
+    setArchetypeSelection(restoredIds);
     if (saved.monsterTipo) el.monsterTipo.value = saved.monsterTipo;
     if (saved.monsterAttr) el.monsterAttr.value = saved.monsterAttr;
     if (saved.tier) el.tier.value = saved.tier;
@@ -2130,10 +2213,6 @@ async function boot(): Promise<void> {
   el.tabCreate.addEventListener("click", () => switchTab("create"));
   el.tabCatalog.addEventListener("click", () => switchTab("catalog"));
   el.tabEffects.addEventListener("click", () => switchTab("effects"));
-  el.archetype.addEventListener("change", () => {
-    syncTipoVisibility();
-    persistUi();
-  });
   el.monsterTipo.addEventListener("change", () => persistUi());
   el.monsterAttr.addEventListener("change", () => persistUi());
   el.tier.addEventListener("change", () => persistUi());
@@ -2164,6 +2243,7 @@ async function boot(): Promise<void> {
   });
   el.btnCloseDecks.addEventListener("click", () => setDecksPanelOpen(false));
   el.btnExportDeck.addEventListener("click", () => exportCurrentDeck());
+  el.btnAddCard.addEventListener("click", () => openPickerPanel());
   el.btnClosePicker.addEventListener("click", () => setPickerPanelOpen(false));
   el.pickerQ.addEventListener("input", () => {
     state.pickerQ = el.pickerQ.value;

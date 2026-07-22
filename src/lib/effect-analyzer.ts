@@ -52,6 +52,7 @@ export const TIER_OVERRIDES: Record<string, PowerTier> = {
   // Wipes / bombs canónicos
   raigeki: 5,
   dark_hole: 5,
+  megamorph: 5,
   crush_card_virus: 5,
   mirror_force: 5,
   // Deuses egípcios
@@ -68,6 +69,7 @@ export const TIER_OVERRIDES: Record<string, PowerTier> = {
   "blue-eyes_twin_burst_dragon": 5,
   "blue-eyes_chaos_max_dragon": 5,
   "red-eyes_b_dragon": 5,
+  "red-eyes-absolut-darkness-dragon": 5,
   "red-eyes_dark_dragoon": 5,
   "red-eyes_darkness_metal_dragon": 5,
   "red-eyes_darkness_dragon": 5,
@@ -78,6 +80,8 @@ export const TIER_OVERRIDES: Record<string, PowerTier> = {
   archfiend_black_skull_dragon: 5,
   meteor_b_dragon: 5,
   lord_of_the_red: 5,
+  lord_of_souls: 5,
+  "red-eyes-absolut-darkness-dragon": 5,
   dark_magician: 5,
   dark_magician_of_chaos: 5,
   dark_magician_girl: 4,
@@ -132,6 +136,10 @@ const TEXT_RULES: TextRule[] = [
   {
     tag: "attack_boost",
     re: /aumenta.*(atk|ataque|poder|def)|ganha \d+.*(atk|ataque|def)|(\+|mais)\s*\d{2,4}.*(atk|ataque|poder|def)|gains? \d+/i,
+  },
+  {
+    tag: "explosive_equip",
+    re: /dobra o poder|double the (current )?power|dobra.*(atk|ataque|poder)/i,
   },
   {
     tag: "burn_direct",
